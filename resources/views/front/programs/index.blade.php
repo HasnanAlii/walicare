@@ -4,10 +4,12 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 px-4 space-y-8">
 
             <div>
-                <h2 class="text-3xl font-bold text-gray-900">Temukan Kegiatan Kebaikan</h2>
-                <p class="mt-2 text-gray-600">Pilih kegiatan yang ingin Anda bantu atau cari kegiatan spesifik di bawah ini.</p>
+              <h2 class="text-3xl font-bold text-gray-900">Program Kebaikan Kami</h2>
+              <p class="mt-2 text-gray-600">Jelajahi berbagai program sosial yang dapat Anda dukung untuk menciptakan perubahan nyata.</p>
+
+
                 
-                <form action="{{ route('events.index') }}" method="GET" class="mt-6">
+                {{-- <form action="{{ route('programs.index') }}" method="GET" class="mt-6">
                     <div class="relative w-full md:w-1/2">
                         <input 
                             type="text" 
@@ -26,7 +28,7 @@
                     @if(request('category'))
                         <input type="hidden" name="category" value="{{ request('category') }}">
                     @endif
-                </form>
+                </form> --}}
             </div>
 
 
@@ -107,13 +109,6 @@
         </div>
     </div>
 
-    {{-- 
-        CATATAN: Pastikan Anda telah menyertakan script Feather Icons
-        di layout utama Anda (misalnya di guest.blade.php) agar ikon bisa muncul.
-        <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-        <script>
-            feather.replace();
-        </script>
-    --}}
+        
 
 </x-guest-layout>

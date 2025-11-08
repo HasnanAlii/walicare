@@ -51,10 +51,6 @@ class UserSeeder extends Seeder
          * 2️⃣ Buat Role utama
          */
         $superadmin = Role::firstOrCreate(['name' => 'Superadmin']);
-        $programManager = Role::firstOrCreate(['name' => 'Program Manager']);
-        $finance = Role::firstOrCreate(['name' => 'Finance']);
-        $verifikator = Role::firstOrCreate(['name' => 'Verifikator']);
-        $contentEditor = Role::firstOrCreate(['name' => 'Content Editor']);
         $userRole = Role::firstOrCreate(['name' => 'User']);
 
         /**
@@ -62,48 +58,14 @@ class UserSeeder extends Seeder
          */
         $superadmin->syncPermissions(Permission::all());
 
-        $programManager->syncPermissions([
-            'view programs',
-            'create programs',
-            'edit programs',
-            'delete programs',
-            'manage programs',
-            'view beneficiaries',
-            'create beneficiaries',
-            'edit beneficiaries',
-            'delete beneficiaries',
-            'view reports',
-        ]);
-
-        $finance->syncPermissions([
-            'view donations',
-            'verify donations',
-            'manage transactions',
-            'view reports',
-            'export reports',
-        ]);
-
-        $verifikator->syncPermissions([
-            'verify donations',
-            'view programs',
-        ]);
-
-        $contentEditor->syncPermissions([
-            'view programs',
-            'create programs',
-            'edit programs',
-        ]);
+  
 
         $userRole->syncPermissions([
             'view programs',
             'view donations',
         ]);
 
-        /**
-         * 4️⃣ Buat akun untuk setiap role
-         */
-
-        // Superadmin
+      
         $admin = User::firstOrCreate(
             ['email' => 'admin@gmail.com'],
             [
@@ -113,47 +75,7 @@ class UserSeeder extends Seeder
         );
         $admin->assignRole($superadmin);
 
-        // Program Manager
-        $manager = User::firstOrCreate(
-            ['email' => 'manager@gmail.com'],
-            [
-                'name' => 'Program Manager',
-                'password' => Hash::make('password'),
-            ]
-        );
-        $manager->assignRole($programManager);
-
-        // Finance
-        $financeUser = User::firstOrCreate(
-            ['email' => 'finance@gmail.com'],
-            [
-                'name' => 'Finance Officer',
-                'password' => Hash::make('password'),
-            ]
-        );
-        $financeUser->assignRole($finance);
-
-        // Verifikator
-        $verif = User::firstOrCreate(
-            ['email' => 'verifikator@gmail.com'],
-            [
-                'name' => 'Verifikator Donasi',
-                'password' => Hash::make('password'),
-            ]
-        );
-        $verif->assignRole($verifikator);
-
-        // Content Editor
-        $editor = User::firstOrCreate(
-            ['email' => 'editor@gmail.com'],
-            [
-                'name' => 'Content Editor',
-                'password' => Hash::make('password'),
-            ]
-        );
-        $editor->assignRole($contentEditor);
-
-        // Donatur / User biasa
+        
         $user = User::firstOrCreate(
             ['email' => 'user@gmail.com'],
             [

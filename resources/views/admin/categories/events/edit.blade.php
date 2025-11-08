@@ -3,7 +3,7 @@
 
         {{-- Header --}}
         <h2 class="text-2xl font-bold text-green-900 mb-6">
-            Edit Kategori: {{ $category->name }}
+            Edit Kategori Kegiatan: {{ $categoriesevent->name }}
         </h2>
 
         {{-- Blok Error Konsisten --}}
@@ -23,7 +23,7 @@
 
         {{-- Card Formulir --}}
         <div class="bg-white shadow-lg rounded-lg p-6 md:p-8">
-            <form action="{{ route('admin.categories.update', $category) }}" method="POST">
+            <form action="{{ route('admin.categoriesevents.update', $categoriesevent) }}" method="POST">
                 @csrf
                 @method('PUT')
 
@@ -37,25 +37,26 @@
                     <label class="{{ $formLabelClass }}">Nama Kategori *</label>
                     <input type="text" 
                            name="name" 
-                           value="{{ old('name', $category->name) }}" 
+                           value="{{ old('name', $categoriesevent->name) }}" 
                            required 
                            class="{{ $formInputClass }}" 
-                           placeholder="Masukkan nama kategori">
+                           placeholder="Masukkan nama kategori kegiatan">
                 </div>
 
-                {{-- Slug --}}
-                <div class="mb-6">
+                {{-- Slug (opsional) --}}
+                <div class="mb-4">
                     <label class="{{ $formLabelClass }}">Slug (opsional)</label>
                     <input type="text" 
                            name="slug" 
-                           value="{{ old('slug', $category->slug) }}" 
+                           value="{{ old('slug', $categoriesevent->slug) }}" 
                            class="{{ $formInputClass }}" 
                            placeholder="Akan dibuat otomatis jika kosong">
                 </div>
 
+            
                 {{-- Tombol Aksi Konsisten --}}
                 <div class="flex gap-3 border-t pt-6 justify-end">
-                    <a href="{{ route('admin.categories.index') }}" 
+                    <a href="{{ route('admin.categoriesevents.index') }}" 
                        class="inline-flex items-center gap-2 px-5 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">
                         <i data-feather="x" class="w-4 h-4"></i>
                         Batal

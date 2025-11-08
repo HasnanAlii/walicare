@@ -60,7 +60,10 @@
             <a href="{{ route('admin.events.index') }}" class="nav-item @if(request()->routeIs('admin.events.*')) active @endif">
                 <i data-feather="calendar"></i> Kegiatan
             </a>
-            <a href="{{ route('admin.categories.index') }}" class="nav-item @if(request()->routeIs('admin.categories.*')) active @endif">
+           <a href="{{ route('admin.categories.index') }}" class="nav-item 
+                    @if(request()->routeIs('admin.categories.*') || request()->routeIs('admin.categoriesvents.*')) 
+                        active 
+                    @endif">
                 <i data-feather="grid"></i> Kategori
             </a>
         </nav>

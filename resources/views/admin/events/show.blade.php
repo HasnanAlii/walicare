@@ -31,7 +31,9 @@
                                 <div class="flex items-start gap-4">
                                     {{-- Avatar Placeholder --}}
                                     <div class="flex-shrink-0 w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                                        <span class="text-lg font-medium text-gray-500">{{ substr($comment->user->name, 0, 1) }}</span>
+                                         <img class="w-10 h-10 rounded-full object-cover" 
+                                            src="{{ asset('storage/' . $comment->user->profile_photo) }}"  
+                                            alt="{{ $comment->user->name }}">
                                     </div>
                                     <div class="flex-1">
                                         <div class="flex justify-between items-center">

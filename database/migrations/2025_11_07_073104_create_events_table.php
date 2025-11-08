@@ -13,15 +13,7 @@ return new class extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
-
-            // 🔹 Relasi ke kategori
-            $table->foreignId('category_id')
-                  ->nullable()
-                  ->constrained('categories')
-                  ->nullOnDelete(); 
-                  // Jika kategori dihapus, category_id di event jadi null
-
-            // 🔹 Informasi utama event
+            $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete(); 
             $table->string('title'); 
             $table->string('slug')->unique(); 
             $table->text('description')->nullable(); 
@@ -29,8 +21,6 @@ return new class extends Migration
             $table->date('start_date')->nullable(); 
             $table->date('end_date')->nullable(); 
             $table->string('location')->nullable(); 
-
-            // 🔹 Status aktif event
             $table->boolean('is_active')->default(true); 
 
             $table->timestamps(); 

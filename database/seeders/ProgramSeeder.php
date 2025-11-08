@@ -12,8 +12,7 @@ class ProgramSeeder extends Seeder
 {
     public function run(): void
     {
-        $users = User::all(); // pastikan sudah ada user untuk created_by
-
+        $users = User::all(); 
         $programs = [
             ['name' => 'MUIN (Mushola Indah)', 'category' => 'Dakwah'],
             ['name' => 'Qurban Bareng Wali', 'category' => 'Sosial'],
@@ -23,6 +22,7 @@ class ProgramSeeder extends Seeder
             ['name' => 'Tanggap Bencana', 'category' => 'Kemanusiaan'],
             ['name' => 'Santunan Yatim & Dhuafa', 'category' => 'Sosial'],
             ['name' => 'WaliCare Peduli Palestina', 'category' => 'Kemanusiaan'],
+
         ];
 
         foreach ($programs as $prog) {
@@ -39,6 +39,7 @@ class ProgramSeeder extends Seeder
                     'target_amount' => 10000000,
                     'collected_amount' => 0,
                     'status' => 'active',
+                    'image' => 'events/baek.jpg',
                     'start_date' => now()->format('Y-m-d'),
                     'end_date' => now()->addMonth()->format('Y-m-d'),
                     'location' => 'Cianjur',

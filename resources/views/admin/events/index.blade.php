@@ -20,7 +20,7 @@
                     {{-- Gambar --}}
                     <div class="w-full">
                         {{-- Ganti 'event->image' jika Anda memiliki field gambar --}}
-                        @if(false) 
+                        @if(true) 
                             <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->title }}" class="w-full h-48 object-cover aspect-video">
                         @else
                             {{-- Placeholder jika tidak ada gambar --}}

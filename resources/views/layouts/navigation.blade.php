@@ -146,9 +146,12 @@
             </div>
         </div>
     </div>
+{{-- 🌿 Navbar Hijau --}}
+<div class="bg-[#25b86d] text-white shadow-md">
+    <div class="max-w-7xl mx-auto py-2 flex flex-wrap justify-between items-center px-4">
 
-    <div class="bg-[#25b86d] text-white shadow-md">
-        <div class="max-w-7xl mx-auto py-2 flex flex-wrap justify-start space-x-2 sm:space-x-3 px-4 items-center">
+        {{-- Navigasi Utama --}}
+        <div class="flex flex-wrap items-center space-x-2 sm:space-x-3">
             <x-nav-link href="{{ route('home') }}" :active="request()->routeIs('home')" 
                 class="flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-[#a8e6cf] hover:text-black transition duration-150 ease-in-out">
                 <i data-feather="home" class="w-4 h-4 sm:w-5 sm:h-5"></i>
@@ -167,7 +170,40 @@
                 <span class="text-xs sm:text-sm">Kegiatan</span>
             </x-nav-link>
         </div>
+
+        {{-- 🔍 Form Pencarian --}}
+        <form action="{{ route('programs.index') }}" method="GET" class="mt-2 md:mt-0 w-full md:w-auto md:flex md:items-center">
+            <div class="relative w-full md:w-64">
+                <input 
+                    type="text" 
+                    name="search" 
+                    value="{{ request('search') }}" 
+                    placeholder="Cari Program..." 
+                    class="w-full pl-4 pr-10 py-2 text-sm rounded-lg border border-transparent
+                           focus:border-green-400 focus:ring-2 focus:ring-green-300 focus:outline-none
+                           text-gray-700 placeholder-gray-400"
+                >
+                <button type="submit" class="absolute right-0 top-0 h-full flex items-center pr-3 text-gray-400 hover:text-green-600">
+                    <i data-feather="search" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            {{-- Hidden kategori --}}
+            @if(request('category'))
+                <input type="hidden" name="category" value="{{ request('category') }}">
+            @endif
+        </form>
+
     </div>
+</div>
+
+{{-- Feather Icons --}}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        if (typeof feather !== 'undefined') feather.replace();
+    });
+</script>
+
 
     {{-- Batas bawah --}}
     <div class="w-full h-1 bg-[#a8e6cf]"></div>

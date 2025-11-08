@@ -1,18 +1,116 @@
 <x-admin-layout>
-    <div class="py-6 max-w-3xl mx-auto">
-        <h2 class="text-2xl font-bold mb-6">Tambah Event</h2>
+    <div class="py-6">
+        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+            <h2 class="text-2xl font-bold text-green-900 mb-6">Tambah Kegiatan Baru</h2>
 
-        <form action="{{ route('admin.events.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4 bg-white p-6 rounded shadow">
-            @csrf
+            {{-- Blok Error --}}
+            @if ($errors->any())
+                <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">
+                    <div class="flex items-center">
+                        <i data-feather="alert-circle" class="w-5 h-5 mr-3 text-red-600"></i>
+                        <h4 class="font-semibold">Terjadi Kesalahan</h4>
+                    </div>
+                    <ul class="list-disc pl-10 mt-2 text-sm">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-            <input type="text" name="title" placeholder="Judul Event" class="w-full border px-3 py-2 rounded" value="{{ old('title') }}" required>
-            <textarea name="description" placeholder="Deskripsi Event" class="w-full border px-3 py-2 rounded">{{ old('description') }}</textarea>
-            <input type="file" name="image" class="w-full">
-            <input type="date" name="start_date" class="w-full border px-3 py-2 rounded" value="{{ old('start_date') }}">
-            <input type="date" name="end_date" class="w-full border px-3 py-2 rounded" value="{{ old('end_date') }}">
-            <input type="text" name="location" placeholder="Lokasi" class="w-full border px-3 py-2 rounded" value="{{ old('location') }}">
+            {{-- Card Formulir --}}
+            <div class="bg-white shadow-lg rounded-lg p-6 md:p-8">
+                <form action="{{ route('admin.events.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
 
-            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded">Simpan</button>
-        </form>
+                    @php
+                        $formInputClass = 'w-full p-1.5 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50';
+                        $formLabelClass = 'block mb-1.5 text-sm font-medium text-gray-700';
+                    @endphp
+
+                    {{-- Kategori (SESUAIKAN DARI MIGRATION) --}}
+                    <div class="mb-4">
+                        <label class="{{ $formLabelClass }}">Kategori Kegiatan</label>
+                        <select name="category_id" class="{{ $formInputClass }}">
+                            <option value="">-- Pilih Kategori --</option>
+                            {{-- Asumsi Anda meneruskan $categories dari Controller --}}
+                            @foreach($categories ?? [] as $id => $name)
+                                <option value="{{ $id }}" {{ old('category_id') == $id ? 'selected' : '' }}>{{ $name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- Judul --}}
+                    <div class="mb-4">
+                        <label class="{{ $formLabelClass }}">Judul Kegiatan *</label>
+                        <input type="text" name="title" value="{{ old('title') }}" class="{{ $formInputClass }}" required placeholder="Masukkan judul Kegiatan">
+                    </div>
+
+                    {{-- Slug (SESUAIKAN DARI MIGRATION) --}}
+                    <div class="mb-4">
+                        <label class="{{ $formLabelClass }}">Slug (opsional)</label>
+                        <input type="text" name="slug" value="{{ old('slug') }}" class="{{ $formInputClass }}" placeholder="Akan dibuat otomatis jika kosong">
+                    </div>
+
+                    {{-- Deskripsi --}}
+                    <div class="mb-4">
+                        <label class="{{ $formLabelClass }}">Deskripsi Kegiatan</label>
+                        <textarea name="description" class="{{ $formInputClass }}" rows="4" placeholder="Deskripsi lengkap Kegiatan">{{ old('description') }}</textarea>
+                    </div>
+
+                    {{-- Gambar --}}
+                    <div class="mb-4">
+                        <label class="{{ $formLabelClass }}">Gambar Kegiatan</label>
+                        <input type="file" name="image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
+                        <p class="text-xs text-gray-500 mt-1">Format: jpeg, png, jpg, gif, webp. Maksimal 5MB.</p>
+                    </div>
+
+                    {{-- Tanggal (Grid 2 Kolom) --}}
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="{{ $formLabelClass }}">Tanggal Mulai</label>
+                            <input type="date" name="start_date" value="{{ old('start_date') }}" class="{{ $formInputClass }}">
+                        </div>
+                        <div>
+                            <label class="{{ $formLabelClass }}">Tanggal Selesai</label>
+                            <input type="date" name="end_date" value="{{ old('end_date') }}" class="{{ $formInputClass }}">
+                        </div>
+                    </div>
+
+                    {{-- Lokasi --}}
+                    <div class="mb-4">
+                        <label class="{{ $formLabelClass }}">Lokasi Kegiatan</label>
+                        <input type="text" name="location" value="{{ old('location') }}" class="{{ $formInputClass }}" placeholder="Masukan Lokasi Kegiatan">
+                    </div>
+
+                    <hr class="my-6">
+
+                    {{-- Status Aktif (SESUAIKAN DARI MIGRATION) --}}
+                    <div class="mb-6">
+                        <label class="flex items-center gap-3">
+                            <input type="hidden" name="is_active" value="0"> {{-- Nilai default jika checkbox tidak dicentang --}}
+                            <input type="checkbox" name="is_active" value="1" 
+                                   {{ old('is_active', true) ? 'checked' : '' }} {{-- 'true' = default tercentang --}}
+                                   class="h-5 w-5 text-green-600 border-gray-300 rounded shadow-sm focus:ring-green-500">
+                            <span class="font-medium text-gray-700">Aktifkan Kegiatan ini</span>
+                        </label>
+                    </div>
+
+                    {{-- Tombol Aksi --}}
+                    <div class="flex gap-3 border-t pt-6 justify-end">
+                        <a href="{{ route('admin.events.index') }}" class="inline-flex items-center gap-2 px-5 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">
+                            <i data-feather="x" class="w-4 h-4"></i>
+                            Batal
+                        </a>
+                        <button type="submit" class="inline-flex items-center gap-2 px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium">
+                            <i data-feather="save" class="w-4 h-4"></i>
+                            Simpan Kegiatan
+                        </button>
+                    
+                    </div>
+
+                </form>
+            </div>
+        </div>
     </div>
 </x-admin-layout>

@@ -113,7 +113,7 @@
                     @forelse ($comments as $comment)
                         <div class="flex items-start gap-3">
                             <img class="w-10 h-10 rounded-full object-cover" 
-                                 src="{{ $comment->user->profile_photo_url ?? asset('storage/logo.jpg') }}" 
+                                 src="{{ asset('storage/' . $comment->user->profile_photo) }}"  
                                  alt="{{ $comment->user->name }}">
                             <div class="flex-1 bg-gray-50 rounded-lg px-4 py-3">
                                 <div class="flex justify-between items-center">

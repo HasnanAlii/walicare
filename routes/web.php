@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\BeneficiaryController as AdminBeneficiaryControll
 use App\Http\Controllers\Admin\MilestoneController as AdminMilestoneController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\EventCategoryController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\Front\DonationController;
@@ -73,7 +74,7 @@ Route::middleware(['auth'])->group(function () {
 // =======================
 // 🧰 ADMIN PANEL (Spatie Protected)
 // =======================
-Route::middleware(['auth', 'role:Superadmin|Program Manager|Finance'])
+Route::middleware(['auth', 'role:Superadmin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
@@ -84,7 +85,7 @@ Route::middleware(['auth', 'role:Superadmin|Program Manager|Finance'])
         // ===== CATEGORY MANAGEMENT =====
         Route::resource('categories', AdminCategoryController::class)
             ->middleware('permission:manage programs');
-
+        Route::resource('categoriesevents', EventCategoryController::class);
         // ===== PROGRAM MANAGEMENT =====
 
         Route::resource('events', EventController::class);

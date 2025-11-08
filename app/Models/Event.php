@@ -10,8 +10,8 @@ class Event extends Model
 {
     use HasFactory;
 
-    // Kolom yang bisa diisi secara massal
     protected $fillable = [
+        'category_id',
         'title',
         'slug',
         'description',
@@ -21,15 +21,12 @@ class Event extends Model
         'location',
         'is_active',
     ];
-
-    // Cast kolom tanggal
     protected $casts = [
         'start_date' => 'datetime',
         'end_date' => 'datetime',
         'is_active' => 'boolean',
     ];
 
-    // Jika ingin otomatis membuat slug dari title
     public static function boot()
     {
         parent::boot();
@@ -50,8 +47,8 @@ class Event extends Model
         return $this->morphMany(Like::class, 'likeable');
     }
     public function category()
-{
-    return $this->belongsTo(Category::class);
-}
+    {
+        return $this->belongsTo(Category::class);
+    }
 
 }
