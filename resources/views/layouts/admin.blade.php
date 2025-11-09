@@ -10,7 +10,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="//unpkg.com/alpinejs" defer></script>
 
-
     <!-- Feather Icons -->
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 
@@ -30,14 +29,51 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+        /* === Sidebar Navigation === */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            color: white;
+            transition: all 0.2s ease;
+        }
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        .nav-item.active {
+            background-color: #d9f5e1; /* hijau muda lembut */
+            color: #16a862;
+        }
+
+        /* === Hilangkan animasi Select2 === */
+        .select2-container--open .select2-dropdown {
+            transition: none !important;
+            animation: none !important;
+        }
+        .select2-results__options {
+            transition: none !important;
+            animation: none !important;
+        }
+        .select2-dropdown {
+            opacity: 1 !important;
+            transform: none !important;
+        }
+    </style>
 </head>
+
 <body class="bg-green-50 flex min-h-screen font-sans">
 
+    <!-- SIDEBAR -->
     <aside class="w-64 bg-green-600 text-white flex flex-col shadow-lg">
-       <div class="p-6 flex flex-col items-center gap-2 border-b border-green-500">
-          <a href="{{ route('home') }}">
-         <img src="{{ asset('storage/logo.jpg') }}" alt="Logo" class="h-20 w-20 shadow-md">
-        </a>
+        <div class="p-6 flex flex-col items-center gap-2 border-b border-green-500">
+            <a href="{{ route('home') }}">
+                <img src="{{ asset('storage/logo.jpg') }}" alt="Logo" class="h-20 w-20 shadow-md rounded-sm">
+            </a>
             <span class="text-xl font-bold tracking-wide text-center text-white mt-2">Walicare Admin</span>
         </div>
 
@@ -46,37 +82,30 @@
                 <i data-feather="home"></i> Beranda
             </a>
             <a href="{{ route('admin.programs.index') }}" class="nav-item @if(request()->routeIs('admin.programs.*')) active @endif">
-                <i data-feather="layers"></i> Program
+                <i data-feather="grid"></i> Program
             </a>
-            {{-- <a href="{{ route('admin.milestones.index') }}" class="nav-item @if(request()->routeIs('admin.milestones.*')) active @endif">
-                <i data-feather="flag"></i> Tonggak Pencapaian
-            </a> --}}
-            {{-- <a href="{{ route('admin.donations.index') }}" class="nav-item @if(request()->routeIs('admin.donations.*')) active @endif">
-                <i data-feather="dollar-sign"></i> Donasi
-            </a> --}}
             <a href="{{ route('admin.beneficiaries.index') }}" class="nav-item @if(request()->routeIs('admin.beneficiaries.*')) active @endif">
                 <i data-feather="users"></i> Penerima Donasi
             </a>
             <a href="{{ route('admin.events.index') }}" class="nav-item @if(request()->routeIs('admin.events.*')) active @endif">
                 <i data-feather="calendar"></i> Kegiatan
             </a>
-           <a href="{{ route('admin.categories.index') }}" class="nav-item 
+            <a href="{{ route('admin.categories.index') }}" class="nav-item 
                     @if(request()->routeIs('admin.categories.*') || request()->routeIs('admin.categoriesvents.*')) 
                         active 
                     @endif">
-                <i data-feather="grid"></i> Kategori
+                <i data-feather="layers"></i> Kategori
             </a>
-
             <a href="{{ route('admin.mitras.index') }}" class="nav-item @if(request()->routeIs('admin.mitras.*')) active @endif">
                 <i data-feather="users"></i> Mitra
-            </a> 
+            </a>
         </nav>
     </aside>
 
+    <!-- KONTEN UTAMA -->
     <div class="flex-1 flex flex-col min-h-screen">
         <header class="bg-white shadow-sm border-b border-gray-200 p-4 flex justify-between items-center">
             <div class="flex items-center gap-4">
-            
                 <h1 class="text-xl font-bold text-gray-800 ml-5">@yield('title', 'Dashboard Admin')</h1>
             </div>
             <div class="flex items-center gap-4 mr-5">
@@ -96,8 +125,8 @@
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <x-dropdown-link :href="route('logout')"
-                                    class="flex items-center gap-2"
-                                    onclick="event.preventDefault(); this.closest('form').submit();">
+                                class="flex items-center gap-2"
+                                onclick="event.preventDefault(); this.closest('form').submit();">
                                 <i data-feather="log-out" class="w-4 h-4"></i> Keluar
                             </x-dropdown-link>
                         </form>
@@ -105,58 +134,41 @@
                 </x-dropdown>
             </div>
         </header>
+
         <main class="p-6 flex-1 bg-green-50">
             {{ $slot }}
         </main>
     </div>
 
-    <style>
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: 500;
-            color: white;
-            transition: all 0.2s ease;
-        }
-        .nav-item:hover {
-            background-color: rgba(255, 255, 255, 0.15);
-        }
-        .nav-item.active {
-            background-color: #d9f5e1; /* hijau muda lembut */
-            color: #16a862;
-        }
-    </style>
-
+    <!-- Script Feather -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            if(typeof feather !== 'undefined') feather.replace();
+            if (typeof feather !== 'undefined') feather.replace();
+
+            // Inisialisasi Select2 tanpa animasi
+            $('.select2').select2({
+                minimumResultsForSearch: 0,
+                dropdownCssClass: 'no-anim'
+            });
         });
     </script>
 
+    <!-- SweetAlert2 -->
     <script>
         const Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
-            timer: 5000,
+            timer: 3000,
             timerProgressBar: true
         });
 
         @if(Session::has('message'))
             let type = "{{ Session::get('alert-type', 'info') }}";
-            switch(type){
-                case 'info':
-                    Toast.fire({ icon: 'info', title: "{{ Session::get('message') }}" }); break;
-                case 'success':
-                    Toast.fire({ icon: 'success', title: "{{ Session::get('message') }}" }); break;
-                case 'warning':
-                    Toast.fire({ icon: 'warning', title: "{{ Session::get('message') }}" }); break;
-                case 'error':
-                    Toast.fire({ icon: 'error', title: "{{ Session::get('message') }}" }); break;
-            }
+            Toast.fire({
+                icon: type,
+                title: "{{ Session::get('message') }}"
+            });
         @endif
 
         @if ($errors->any())
@@ -169,38 +181,6 @@
         @endif
     </script>
 
-    <script>
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 5000,
-            timerProgressBar: true
-        });
-
-        @if(Session::has('message'))
-            let type = "{{ Session::get('alert-type', 'info') }}";
-            switch(type){
-                case 'info':
-                    Toast.fire({ icon: 'info', title: "{{ Session::get('message') }}" }); break;
-                case 'success':
-                    Toast.fire({ icon: 'success', title: "{{ Session::get('message') }}" }); break;
-                case 'warning':
-                    Toast.fire({ icon: 'warning', title: "{{ Session::get('message') }}" }); break;
-                case 'error':
-                    Toast.fire({ icon: 'error', title: "{{ Session::get('message') }}" }); break;
-            }
-        @endif
-
-        @if ($errors->any())
-            let errors = `<ul class="text-left">`;
-            @foreach ($errors->all() as $error)
-                errors += `<li>{{ $error }}</li>`;
-            @endforeach
-            errors += `</ul>`;
-            Swal.fire({ icon: 'error', title: "Ooops!", html: errors });
-        @endif
-    </script>
     @stack('scripts')
 </body>
 </html>

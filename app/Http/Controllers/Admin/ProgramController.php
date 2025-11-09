@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProgramRequest;
 use App\Http\Requests\UpdateProgramRequest;
 use App\Models\Program;
+use Illuminate\Http\Request;   
 use App\Models\ProgramCategory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -13,21 +14,12 @@ use Illuminate\Support\Str;
 
 class ProgramController extends Controller
 {
-    // public function __construct()
-    // {
-    //     // Pastikan user memiliki salah satu role atau permission berikut
-    //     $this->middleware(['role_or_permission:Superadmin|Program Manager|manage programs']);
-    // }
-
     /**
      * Tampilkan semua program beserta kategorinya.
      */
     public function index()
     {
-        $programs = Program::with('category')
-            ->latest()
-            ->paginate(15);
-
+        $programs = Program::with('category')->latest()->paginate(15);
         return view('admin.programs.index', compact('programs'));
     }
 
@@ -43,58 +35,56 @@ class ProgramController extends Controller
     /**
      * Simpan data program baru.
      */
-  public function store(StoreProgramRequest $request)
-{
-    $data = $request->validated();
-    $data['created_by'] = Auth::id();
+    public function store(Request $request)
+    {
+        // Validasi manual
+        $validated = $request->validate([
+            'category_id' => ['nullable', 'exists:program_categories,id'],
+            'title' => ['required', 'string', 'max:255', 'unique:programs,title'],
+            'slug' => ['nullable', 'string', 'max:255', 'unique:programs,slug'],
+            'summary' => ['nullable', 'string', 'max:500'],
+            'description' => ['nullable', 'string'],
+            'target_amount' => ['required'],
+            'collected_amount' => ['nullable'],
+            'breakdown' => ['nullable', 'array'],
+            'status' => ['required', 'in:draft,active,completed,cancelled'],
+            'start_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'is_featured' => ['nullable', 'boolean'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:15120'], 
+        ]);
 
-    // Handle upload image
-    if ($request->hasFile('image')) {
-        $data['image'] = $request->file('image')->store('programs', 'public'); 
-        // Akan tersimpan di storage/app/public/programs
-    }
+        // Bersihkan angka dari titik (misalnya "10.000" → "10000")
+        $validated['target_amount'] = str_replace('.', '', $validated['target_amount']);
+        $validated['collected_amount'] = str_replace('.', '', $validated['collected_amount'] ?? 0);
 
-    // Jika slug kosong, generate otomatis dari title
-    if (empty($data['slug'])) {
-        $data['slug'] = Str::slug($data['title']);
-    }
+        // Tambahkan ID pembuat
+        $validated['created_by'] = Auth::id();
 
-    Program::create($data);
-
-    return redirect()
-        ->route('admin.programs.index')
-        ->with('success', 'Program berhasil dibuat.');
-}
-
-public function update(UpdateProgramRequest $request, Program $program)
-{
-    $data = $request->validated();
-
-    // Handle upload image baru
-    if ($request->hasFile('image')) {
-        // Hapus file lama jika ada
-        if ($program->image && Storage::disk('public')->exists($program->image)) {
-            Storage::disk('public')->delete($program->image);
+        // Upload gambar jika ada
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('programs', 'public');
         }
 
-        $data['image'] = $request->file('image')->store('programs', 'public');
+        // Slug otomatis
+        if (empty($validated['slug'])) {
+            $validated['slug'] = Str::slug($validated['title']);
+        }
+
+        // Simpan data program
+        Program::create($validated);
+
+        return redirect()
+            ->route('admin.programs.index')
+            ->with([
+                'message' => 'Program berhasil dibuat!',
+                'alert-type' => 'success'
+            ]);
     }
-
-    // Regenerate slug jika kosong
-    if (empty($data['slug'])) {
-        $data['slug'] = Str::slug($data['title']);
-    }
-
-    $program->update($data);
-
-    return redirect()
-        ->route('admin.programs.index')
-        ->with('success', 'Program berhasil diperbarui.');
-}
-
 
     /**
-     * Tampilkan form edit program.
+     * Form edit program.
      */
     public function edit(Program $program)
     {
@@ -105,48 +95,106 @@ public function update(UpdateProgramRequest $request, Program $program)
     /**
      * Perbarui data program.
      */
-    // public function update(UpdateProgramRequest $request, Program $program)
-    // {
-    //     $data = $request->validated();
+    public function update(Request $request, Program $program)
+{
+    // Validasi manual seperti di store()
+    $validated = $request->validate([
+        'category_id' => ['nullable', 'exists:program_categories,id'],
+        'title' => ['required', 'string', 'max:255', 'unique:programs,title,' . $program->id],
+        'slug' => ['nullable', 'string', 'max:255', 'unique:programs,slug,' . $program->id],
+        'summary' => ['nullable', 'string', 'max:500'],
+        'description' => ['nullable', 'string'],
+        'target_amount' => ['required'],
+        'collected_amount' => ['nullable'],
+        'breakdown' => ['nullable', 'array'],
+        'status' => ['required', 'in:draft,active,completed,cancelled'],
+        'start_date' => ['nullable', 'date'],
+        'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+        'location' => ['nullable', 'string', 'max:255'],
+        'is_featured' => ['nullable', 'boolean'],
+        'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:15120'],
+    ]);
 
-    //     // regenerate slug jika judul berubah dan slug kosong
-    //     if (empty($data['slug'])) {
-    //         $data['slug'] = Str::slug($data['title']);
-    //     }
+    // Bersihkan angka dari titik (contoh: "10.000" → "10000")
+    $validated['target_amount'] = str_replace('.', '', $validated['target_amount']);
+    $validated['collected_amount'] = str_replace('.', '', $validated['collected_amount'] ?? 0);
 
-    //     $program->update($data);
+    // Upload gambar baru jika ada
+    if ($request->hasFile('image')) {
+        // Hapus gambar lama
+        if ($program->image && Storage::disk('public')->exists($program->image)) {
+            Storage::disk('public')->delete($program->image);
+        }
+        // Simpan gambar baru
+        $validated['image'] = $request->file('image')->store('programs', 'public');
+    }
 
-    //     return redirect()
-    //         ->route('admin.programs.index')
-    //         ->with('success', 'Program berhasil diperbarui.');
-    // }
+    // Slug otomatis jika kosong
+    if (empty($validated['slug'])) {
+        $validated['slug'] = Str::slug($validated['title']);
+    }
+
+    // Update data
+    $program->update($validated);
+
+    return redirect()
+        ->route('admin.programs.index')
+        ->with([
+            'message' => 'Program berhasil diperbarui!',
+            'alert-type' => 'success'
+        ]);
+}
+
 
     /**
      * Hapus program.
      */
-public function destroy(Program $program)
-{
-    $program->delete();
+    public function destroy(Program $program)
+    {
+        try {
+            // Hapus file gambar jika ada
+            if ($program->image && Storage::disk('public')->exists($program->image)) {
+                Storage::disk('public')->delete($program->image);
+            }
 
-    return redirect()->route('admin.programs.index')->with('success', 'Program berhasil dihapus.');
-}
+            $program->delete();
 
- public function show(Program $program)
-{
-    $program->load(['category', 'media']);
+            return redirect()
+                ->route('admin.programs.index')
+                ->with([
+                    'message' => 'Program berhasil dihapus!',
+                    'alert-type' => 'success'
+                ]);
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.programs.index')
+                ->with([
+                    'message' => 'Terjadi kesalahan saat menghapus program.',
+                    'alert-type' => 'error'
+                ]);
+        }
+    }
 
-    $breakdown = $program->breakdown ? json_decode($program->breakdown, true) : [];
+    /**
+     * Tampilkan detail program.
+     */
+    public function show(Program $program)
+    {
+        $program->load(['category', 'media']);
 
-    $media = $program->media;
-    $recentDonations = $program->donations()
-    ->where('status', 'confirmed')
-    ->latest()
-    ->take(15)
-    ->get();
+        $breakdown = $program->breakdown ? json_decode($program->breakdown, true) : [];
+        $media = $program->media;
+        $recentDonations = $program->donations()
+            ->where('status', 'confirmed')
+            ->latest()
+            ->take(15)
+            ->get();
 
-
-    return view('admin.programs.show', compact('program', 'recentDonations','breakdown', 'media'));
-}
-
-
+        return view('admin.programs.show', compact(
+            'program',
+            'recentDonations',
+            'breakdown',
+            'media'
+        ));
+    }
 }

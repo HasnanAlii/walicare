@@ -17,11 +17,16 @@ class MitraController extends Controller
         $mitras = Mitra::latest()->paginate(10);
         return view('admin.mitras.index', compact('mitras'));
     }
-     public function showAll()
+
+    /**
+     * Tampilkan semua mitra di halaman publik.
+     */
+    public function showAll()
     {
         $mitras = Mitra::latest()->get();
         return view('front.tentangkami.mitra', compact('mitras'));
     }
+
     /**
      * Form tambah mitra.
      */
@@ -31,7 +36,7 @@ class MitraController extends Controller
     }
 
     /**
-     * Simpan data mitra.
+     * Simpan data mitra baru.
      */
     public function store(Request $request)
     {
@@ -41,15 +46,29 @@ class MitraController extends Controller
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        $data = $request->only(['name', 'url', 'description']);
+        try {
+            $data = $request->only(['name', 'url', 'description']);
 
-        if ($request->hasFile('logo')) {
-            $data['logo'] = $request->file('logo')->store('mitras', 'public');
+            if ($request->hasFile('logo')) {
+                $data['logo'] = $request->file('logo')->store('mitras', 'public');
+            }
+
+            Mitra::create($data);
+
+            return redirect()
+                ->route('admin.mitras.index')
+                ->with([
+                    'message' => 'Mitra berhasil ditambahkan!',
+                    'alert-type' => 'success'
+                ]);
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.mitras.index')
+                ->with([
+                    'message' => 'Terjadi kesalahan saat menambahkan mitra!',
+                    'alert-type' => 'error'
+                ]);
         }
-
-        Mitra::create($data);
-
-        return redirect()->route('admin.mitras.index')->with('success', 'Mitra berhasil ditambahkan.');
     }
 
     /**
@@ -71,20 +90,34 @@ class MitraController extends Controller
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        $data = $request->only(['name', 'url', 'description']);
+        try {
+            $data = $request->only(['name', 'url', 'description']);
 
-        // hapus logo lama jika ada file baru
-        if ($request->hasFile('logo')) {
-            if ($mitra->logo && Storage::disk('public')->exists($mitra->logo)) {
-                Storage::disk('public')->delete($mitra->logo);
+            // Hapus logo lama jika upload baru
+            if ($request->hasFile('logo')) {
+                if ($mitra->logo && Storage::disk('public')->exists($mitra->logo)) {
+                    Storage::disk('public')->delete($mitra->logo);
+                }
+
+                $data['logo'] = $request->file('logo')->store('mitras', 'public');
             }
 
-            $data['logo'] = $request->file('logo')->store('mitras', 'public');
+            $mitra->update($data);
+
+            return redirect()
+                ->route('admin.mitras.index')
+                ->with([
+                    'message' => 'Mitra berhasil diperbarui!',
+                    'alert-type' => 'success'
+                ]);
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.mitras.index')
+                ->with([
+                    'message' => 'Terjadi kesalahan saat memperbarui mitra!',
+                    'alert-type' => 'error'
+                ]);
         }
-
-        $mitra->update($data);
-
-        return redirect()->route('admin.mitras.index')->with('success', 'Mitra berhasil diperbarui.');
     }
 
     /**
@@ -92,11 +125,26 @@ class MitraController extends Controller
      */
     public function destroy(Mitra $mitra)
     {
-        if ($mitra->logo && Storage::disk('public')->exists($mitra->logo)) {
-            Storage::disk('public')->delete($mitra->logo);
-        }
+        try {
+            if ($mitra->logo && Storage::disk('public')->exists($mitra->logo)) {
+                Storage::disk('public')->delete($mitra->logo);
+            }
 
-        $mitra->delete();
-        return redirect()->route('admin.mitras.index')->with('success', 'Mitra berhasil dihapus.');
+            $mitra->delete();
+
+            return redirect()
+                ->route('admin.mitras.index')
+                ->with([
+                    'message' => 'Mitra berhasil dihapus!',
+                    'alert-type' => 'success'
+                ]);
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.mitras.index')
+                ->with([
+                    'message' => 'Terjadi kesalahan saat menghapus mitra!',
+                    'alert-type' => 'error'
+                ]);
+        }
     }
 }

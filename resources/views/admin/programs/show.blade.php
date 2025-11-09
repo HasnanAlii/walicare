@@ -312,7 +312,7 @@
 
                    <div class="mb-4">
                         <label class="block text-sm font-medium mb-1">Jenis Media *</label>
-                        <select name="type" x-model="type" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500" required>
+                        <select name="type" x-model="type" class="w-full border-gray-300 p-2 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500" required>
                             <option value="">-- Pilih Jenis --</option>
                             <option value="image">Gambar</option>
                             <option value="video">Video</option>
@@ -351,14 +351,14 @@
 
                     <div class="mb-4">
                         <label class="block text-sm font-medium mb-1" x-text="type === 'text' ? 'Isi Teks Update *' : 'Caption / Deskripsi'">Caption</label>
-                        <textarea name="caption" x-model="caption" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500" rows="5" 
+                        <textarea name="caption" x-model="caption" class="w-full border-gray-300 p-2 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500" rows="5" 
                                   :placeholder="type === 'text' ? 'Tulis update atau deskripsi keadaan di sini...' : 'Masukkan caption media'"
                                   :required="type === 'text'"></textarea>
                     </div>
 
                     <div class="flex justify-end gap-3 mt-6">
                         <button type="button" @click="open = false" class="px-5 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">Batal</button>
-                        <button type="submit" class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium" 
+                        <button type="submit" class="px-5 py-2 bg-green-600 text-white rounded-lg  hover:bg-green-700 transition font-medium" 
                                 x-text="mediaId ? 'Perbarui' : 'Tambahkan'"></button>
                     </div>
                 </form>

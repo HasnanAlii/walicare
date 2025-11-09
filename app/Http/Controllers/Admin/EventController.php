@@ -17,10 +17,7 @@ class EventController extends Controller
      */
     public function index()
     {
-        $events = Event::with('category')
-            ->latest()
-            ->paginate(15);
-
+        $events = Event::with('category')->latest()->paginate(15);
         return view('admin.events.index', compact('events'));
     }
 
@@ -49,23 +46,38 @@ class EventController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $data = $request->only([
-            'category_id', 'title', 'description', 'start_date', 'end_date', 'location', 'is_active'
-        ]);
+        try {
+            $data = $request->only([
+                'category_id', 'title', 'description', 'start_date', 'end_date', 'location', 'is_active'
+            ]);
 
-        // Upload gambar jika ada
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('events', 'public');
+            // Upload gambar jika ada
+            if ($request->hasFile('image')) {
+                $data['image'] = $request->file('image')->store('events', 'public');
+            }
+
+            // Generate slug unik
+            $slug = Str::slug($request->title);
+            $count = Event::where('slug', 'like', "$slug%")->count();
+            $data['slug'] = $count ? "{$slug}-" . ($count + 1) : $slug;
+
+            Event::create($data);
+
+            return redirect()
+                ->route('admin.events.index')
+                ->with([
+                    'message' => 'Event berhasil dibuat!',
+                    'alert-type' => 'success'
+                ]);
+
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.events.index')
+                ->with([
+                    'message' => 'Terjadi kesalahan saat membuat event!',
+                    'alert-type' => 'error'
+                ]);
         }
-
-        // Generate slug unik
-        $slug = Str::slug($request->title);
-        $count = Event::where('slug', 'like', "$slug%")->count();
-        $data['slug'] = $count ? "{$slug}-" . ($count + 1) : $slug;
-
-        Event::create($data);
-
-        return redirect()->route('admin.events.index')->with('success', 'Event berhasil dibuat!');
     }
 
     /**
@@ -113,30 +125,45 @@ class EventController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $data = $request->only([
-            'category_id', 'title', 'description', 'start_date', 'end_date', 'location', 'is_active'
-        ]);
+        try {
+            $data = $request->only([
+                'category_id', 'title', 'description', 'start_date', 'end_date', 'location', 'is_active'
+            ]);
 
-        // Jika ada upload baru, hapus lama
-        if ($request->hasFile('image')) {
-            if ($event->image && Storage::exists('public/' . $event->image)) {
-                Storage::delete('public/' . $event->image);
+            // Jika ada upload baru, hapus lama
+            if ($request->hasFile('image')) {
+                if ($event->image && Storage::exists('public/' . $event->image)) {
+                    Storage::delete('public/' . $event->image);
+                }
+                $data['image'] = $request->file('image')->store('events', 'public');
             }
-            $data['image'] = $request->file('image')->store('events', 'public');
+
+            // Jika judul diubah, buat slug baru
+            if ($event->title !== $request->title) {
+                $slug = Str::slug($request->title);
+                $count = Event::where('slug', 'like', "$slug%")
+                    ->where('id', '!=', $event->id)
+                    ->count();
+                $data['slug'] = $count ? "{$slug}-" . ($count + 1) : $slug;
+            }
+
+            $event->update($data);
+
+            return redirect()
+                ->route('admin.events.index')
+                ->with([
+                    'message' => 'Event berhasil diperbarui!',
+                    'alert-type' => 'success'
+                ]);
+
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.events.index')
+                ->with([
+                    'message' => 'Terjadi kesalahan saat memperbarui event!',
+                    'alert-type' => 'error'
+                ]);
         }
-
-        // Jika judul diubah, buat slug baru
-        if ($event->title !== $request->title) {
-            $slug = Str::slug($request->title);
-            $count = Event::where('slug', 'like', "$slug%")
-                ->where('id', '!=', $event->id)
-                ->count();
-            $data['slug'] = $count ? "{$slug}-" . ($count + 1) : $slug;
-        }
-
-        $event->update($data);
-
-        return redirect()->route('admin.events.index')->with('success', 'Event berhasil diperbarui!');
     }
 
     /**
@@ -144,12 +171,26 @@ class EventController extends Controller
      */
     public function destroy(Event $event)
     {
-        if ($event->image && Storage::exists('public/' . $event->image)) {
-            Storage::delete('public/' . $event->image);
+        try {
+            if ($event->image && Storage::exists('public/' . $event->image)) {
+                Storage::delete('public/' . $event->image);
+            }
+
+            $event->delete();
+
+            return redirect()
+                ->route('admin.events.index')
+                ->with([
+                    'message' => 'Event berhasil dihapus!',
+                    'alert-type' => 'success'
+                ]);
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.events.index')
+                ->with([
+                    'message' => 'Terjadi kesalahan saat menghapus event!',
+                    'alert-type' => 'error'
+                ]);
         }
-
-        $event->delete();
-
-        return redirect()->route('admin.events.index')->with('success', 'Event berhasil dihapus!');
     }
 }

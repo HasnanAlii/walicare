@@ -10,10 +10,6 @@ use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
-    //   public function __construct()
-    // {
-    //     $this->middleware(['role_or_permission:Superadmin|Program Manager|manage programs']);
-    // }
     /**
      * Tampilkan daftar semua kategori program.
      */
@@ -43,10 +39,12 @@ class CategoryController extends Controller
 
         return redirect()
             ->route('admin.categories.index')
-            ->with('success', 'Kategori baru berhasil ditambahkan!');
+            ->with([
+                'message' => 'Kategori baru berhasil ditambahkan!',
+                'alert-type' => 'success'
+            ]);
     }
 
-   
     /**
      * Tampilkan form edit kategori.
      */
@@ -67,7 +65,10 @@ class CategoryController extends Controller
 
         return redirect()
             ->route('admin.categories.index')
-            ->with('success', 'Kategori berhasil diperbarui!');
+            ->with([
+                'message' => 'Kategori berhasil diperbarui!',
+                'alert-type' => 'success'
+            ]);
     }
 
     /**
@@ -75,10 +76,22 @@ class CategoryController extends Controller
      */
     public function destroy(ProgramCategory $category)
     {
-        $category->delete();
+        try {
+            $category->delete();
 
-        return redirect()
-            ->route('admin.categories.index')
-            ->with('success', 'Kategori berhasil dihapus!');
+            return redirect()
+                ->route('admin.categories.index')
+                ->with([
+                    'message' => 'Kategori berhasil dihapus!',
+                    'alert-type' => 'success'
+                ]);
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.categories.index')
+                ->with([
+                    'message' => 'Terjadi kesalahan saat menghapus kategori!',
+                    'alert-type' => 'error'
+                ]);
+        }
     }
 }

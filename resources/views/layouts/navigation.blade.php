@@ -111,7 +111,7 @@
                     <i data-feather="home" class="w-4 h-4 sm:w-5 sm:h-5"></i><span class="text-xs sm:text-sm">Beranda</span>
                 </x-nav-link>
                 <x-nav-link href="{{ route('programs.index') }}" :active="request()->routeIs('programs.*')" class="flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-[#dcedc1] hover:text-black transition duration-150 ease-in-out">
-                    <i data-feather="layers" class="w-4 h-4 sm:w-5 sm:h-5"></i><span class="text-xs sm:text-sm">Program</span>
+                    <i data-feather="grid" class="w-4 h-4 sm:w-5 sm:h-5"></i><span class="text-xs sm:text-sm">Program</span>
                 </x-nav-link>
                 <x-nav-link href="{{ route('events.index') }}" :active="request()->routeIs('events.*')" class="flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-[#dcedc1] hover:text-black transition duration-150 ease-in-out">
                     <i data-feather="calendar" class="w-4 h-4 sm:w-5 sm:h-5"></i><span class="text-xs sm:text-sm">Kegiatan</span>

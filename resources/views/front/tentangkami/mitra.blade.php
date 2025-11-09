@@ -32,11 +32,11 @@
                                   @if ($mitra->url) hover:shadow-xl hover:-translate-y-1 @else cursor-default @endif">
                             
                             {{-- PERUBAHAN: Container logo sedikit lebih kecil (h-20) --}}
-                            <div class="h-20 w-full flex items-center justify-center mb-5">
+                            <div class="h-36 w-full  flex items-center justify-center mb-5">
                                 @if ($mitra->logo)
                                     <img src="{{ asset('storage/' . $mitra->logo) }}"
                                          alt="{{ $mitra->name }}"
-                                         class="h-full w-full object-contain rounded-lg
+                                         class="h-full w-full object-contain rounded-xl
                                                 transform transition-transform duration-300 group-hover:scale-105">
                                 @else
                                     {{-- PERUBAHAN: Ikon placeholder diganti --}}

@@ -37,18 +37,31 @@ class EventCategoryController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $slug = $request->slug ?: Str::slug($request->name);
-        $count = Category::where('slug', 'like', "$slug%")->count();
-        $slug = $count ? "{$slug}-" . ($count + 1) : $slug;
+        try {
+            $slug = $request->slug ?: Str::slug($request->name);
+            $count = Category::where('slug', 'like', "$slug%")->count();
+            $slug = $count ? "{$slug}-" . ($count + 1) : $slug;
 
-        Category::create([
-            'name' => $request->name,
-            'slug' => $slug,
-            'description' => $request->description,
-        ]);
+            Category::create([
+                'name' => $request->name,
+                'slug' => $slug,
+                'description' => $request->description,
+            ]);
 
-        return redirect()->route('admin.categoriesevents.index')
-                         ->with('success', 'Kategori kegiatan berhasil ditambahkan!');
+            return redirect()
+                ->route('admin.categoriesevents.index')
+                ->with([
+                    'message' => 'Kategori kegiatan berhasil ditambahkan!',
+                    'alert-type' => 'success'
+                ]);
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.categoriesevents.index')
+                ->with([
+                    'message' => 'Terjadi kesalahan saat menambahkan kategori kegiatan!',
+                    'alert-type' => 'error'
+                ]);
+        }
     }
 
     /**
@@ -70,21 +83,34 @@ class EventCategoryController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $data = $request->only('name', 'description');
+        try {
+            $data = $request->only('name', 'description');
 
-        // Update slug jika nama berubah
-        if ($categoriesevent->name !== $request->name || $request->slug) {
-            $slug = $request->slug ?: Str::slug($request->name);
-            $count = Category::where('slug', 'like', "$slug%")
-                ->where('id', '!=', $categoriesevent->id)
-                ->count();
-            $data['slug'] = $count ? "{$slug}-" . ($count + 1) : $slug;
+            // Update slug jika nama berubah
+            if ($categoriesevent->name !== $request->name || $request->slug) {
+                $slug = $request->slug ?: Str::slug($request->name);
+                $count = Category::where('slug', 'like', "$slug%")
+                    ->where('id', '!=', $categoriesevent->id)
+                    ->count();
+                $data['slug'] = $count ? "{$slug}-" . ($count + 1) : $slug;
+            }
+
+            $categoriesevent->update($data);
+
+            return redirect()
+                ->route('admin.categoriesevents.index')
+                ->with([
+                    'message' => 'Kategori kegiatan berhasil diperbarui!',
+                    'alert-type' => 'success'
+                ]);
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.categoriesevents.index')
+                ->with([
+                    'message' => 'Terjadi kesalahan saat memperbarui kategori kegiatan!',
+                    'alert-type' => 'error'
+                ]);
         }
-
-        $categoriesevent->update($data);
-
-        return redirect()->route('admin.categoriesevents.index')
-                         ->with('success', 'Kategori kegiatan berhasil diperbarui!');
     }
 
     /**
@@ -92,9 +118,22 @@ class EventCategoryController extends Controller
      */
     public function destroy(Category $categoriesevent)
     {
-        $categoriesevent->delete();
+        try {
+            $categoriesevent->delete();
 
-        return redirect()->route('admin.categoriesevents.index')
-                         ->with('success', 'Kategori kegiatan berhasil dihapus!');
+            return redirect()
+                ->route('admin.categoriesevents.index')
+                ->with([
+                    'message' => 'Kategori kegiatan berhasil dihapus!',
+                    'alert-type' => 'success'
+                ]);
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.categoriesevents.index')
+                ->with([
+                    'message' => 'Terjadi kesalahan saat menghapus kategori kegiatan!',
+                    'alert-type' => 'error'
+                ]);
+        }
     }
 }

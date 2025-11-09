@@ -31,6 +31,11 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center px-6">
                 <div class="flex flex-col items-center">
+                    <i data-feather="users" class="w-12 h-12 text-green-500"></i> 
+                    <h3 class="mt-4 text-3xl font-bold text-gray-900">{{ $totalDonors }}</h3>
+                    <p class="text-gray-600 mt-2 font-medium">Total Donatur</p>
+                </div>
+                <div class="flex flex-col items-center">
                     <i data-feather="gift" class="w-12 h-12 text-yellow-500"></i>
                     <h3 class="mt-4 text-3xl font-bold text-gray-900">
                         Rp {{ number_format($totalDonation, 0, ',', '.') }}
@@ -38,12 +43,7 @@
                     <p class="text-gray-600 mt-2 font-medium">Total Donasi Terkumpul</p>
                 </div>
                 <div class="flex flex-col items-center">
-                    <i data-feather="users" class="w-12 h-12 text-blue-500"></i> 
-                    <h3 class="mt-4 text-3xl font-bold text-gray-900">{{ $totalDonors }}</h3>
-                    <p class="text-gray-600 mt-2 font-medium">Total Donatur</p>
-                </div>
-                <div class="flex flex-col items-center">
-                    <i data-feather="target" class="w-12 h-12 text-blue-500"></i>
+                    <i data-feather="layers" class="w-12 h-12 text-blue-500"></i>
                     <h3 class="mt-4 text-3xl font-bold text-gray-900">{{ $totalPrograms }}</h3>
                     <p class="text-gray-600 mt-2 font-medium">Total Program Kebaikan</p>
                 </div>

@@ -46,10 +46,10 @@
                         <div class="p-6 flex-1 flex flex-col items-center text-center"> 
                             
                             {{-- Logo Container --}}
-                            <div class="h-28 w-28 mb-5 flex items-center justify-center">
+                            <div class="h-36 mb-5 flex items-center justify-center">
                                 @if ($mitra->logo)
                                     <img src="{{ asset('storage/' . $mitra->logo) }}" alt="{{ $mitra->name }}" 
-                                         class="h-full w-full object-contain rounded-full border-4 border-green-50 shadow-md">
+                                         class="h-full w-full object-contain rounded-xl border-4 border-green-50 shadow-md">
                                 @else
                                     {{-- Placeholder jika tidak ada logo --}}
                                     <div class="h-full w-full rounded-full bg-gray-100 flex items-center justify-center border-2 border-dashed border-gray-300">

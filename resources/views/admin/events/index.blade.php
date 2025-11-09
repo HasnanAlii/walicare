@@ -1,5 +1,5 @@
 <x-admin-layout>
-    <div class="py-6 max-w-7xl mx-auto">
+    <div class="py-6">
         
         {{-- Header --}}
         <div class="flex justify-between items-center mb-6">
@@ -21,7 +21,7 @@
                     <div class="w-full">
                         {{-- Ganti 'event->image' jika Anda memiliki field gambar --}}
                         @if(true) 
-                            <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->title }}" class="w-full h-48 object-cover aspect-video">
+                            <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->title }}" class="w-full h-96 object-cover aspect-video">
                         @else
                             {{-- Placeholder jika tidak ada gambar --}}
                             <div class="w-full h-48 aspect-video bg-green-50 flex items-center justify-center">

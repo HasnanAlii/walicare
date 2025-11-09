@@ -59,7 +59,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-        Route::get('/programs/{program:slug}', [ProgramController::class, 'show'])->name('programs.show');
+        // Route::get('/programs/{program:slug}', [ProgramController::class, 'show'])->name('programs.show');
 
 });
 

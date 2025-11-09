@@ -29,7 +29,7 @@
                     $percentage = ($target > 0) ? min(100, ($collected / $target) * 100) : 0;
                 @endphp
 
-                <div class="bg-white rounded-xl shadow border border-gray-200 hover:shadow-xl transition-shadow duration-300 flex flex-col relative overflow-hidden">
+                <div class="bg-white rounded-xl  shadow border border-gray-200 hover:shadow-xl transition-shadow duration-300 flex flex-col relative overflow-hidden">
                     
                     @if($program->is_featured)
                         <div class="absolute top-0 right-0 z-10">
@@ -41,7 +41,7 @@
 
                     <div class="w-full">
                         @if($program->image)
-                            <img src="{{ asset('storage/' . $program->image) }}" alt="{{ $program->title }}" class="w-full  object-cover aspect-video">
+                            <img src="{{ asset('storage/' . $program->image) }}" alt="{{ $program->title }}" class="w-full h-96 ">
                         @else
                             <div class="w-full h-48 aspect-video bg-gray-200 flex items-center justify-center">
                                 <i data-feather="image" class="w-16 h-16 text-gray-400"></i>

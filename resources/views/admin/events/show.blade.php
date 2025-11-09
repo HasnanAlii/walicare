@@ -6,7 +6,7 @@
                 {{-- Kolom Utama (Konten Event) --}}
                 <div class="md:col-span-2 bg-white shadow-lg rounded-lg overflow-hidden">
                     @if($event->image)
-                        <img src="{{ asset('storage/'. $event->image) }}" alt="{{ $event->title }}" class="w-full h-96 object-cover">
+                        <img src="{{ asset('storage/'. $event->image) }}" alt="{{ $event->title }}" class="w-full object-cover">
                     @endif
                     
                     <div class="p-6 md:p-8">

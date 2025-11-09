@@ -10,62 +10,99 @@ use Illuminate\Support\Facades\Storage;
 
 class ProgramMediaController extends Controller
 {
-        public function index(Program $program)
+    /**
+     * Tampilkan semua media untuk program tertentu.
+     */
+    public function index(Program $program)
     {
         $media = $program->media()->orderBy('order')->get();
         return view('admin.program_media.index', compact('program', 'media'));
     }
 
+    /**
+     * Form tambah media ke program.
+     */
     public function create(Program $program)
     {
         return view('admin.program_media.create', compact('program'));
     }
 
+    /**
+     * Simpan media baru untuk program.
+     */
     public function store(StoreProgramMediaRequest $request)
     {
-        $program = Program::findOrFail($request->program_id);
+        try {
+            $program = Program::findOrFail($request->program_id);
 
-        $lastOrder = $program->media()->max('order') ?? 0;
+            $lastOrder = $program->media()->max('order') ?? 0;
 
-       $path = $request->hasFile('path') 
-    ? $request->file('path')->store('program_media', 'public') 
-    : null;
+            // Simpan file jika ada
+            $path = $request->hasFile('path') 
+                ? $request->file('path')->store('program_media', 'public') 
+                : null;
 
-        $program->media()->create([
-            'type'    => $request->type,
-            'path'    => $path,
-            'caption' => $request->caption,
-            'order'   => $lastOrder + 1,
-        ]);
+            $program->media()->create([
+                'type'    => $request->type,
+                'path'    => $path,
+                'caption' => $request->caption,
+                'order'   => $lastOrder + 1,
+            ]);
 
-        return redirect()->route('admin.programs.show', $program)
-                        ->with('success', 'Media berhasil ditambahkan.');
+            return redirect()
+                ->route('admin.programs.show', $program)
+                ->with([
+                    'message' => 'Media berhasil ditambahkan!',
+                    'alert-type' => 'success'
+                ]);
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with([
+                    'message' => 'Terjadi kesalahan saat menambahkan media!',
+                    'alert-type' => 'error'
+                ]);
+        }
     }
 
-public function destroy(ProgramMedia $media)
-{
-    $program = $media->program; // Ambil program terkait
-
-    // Hapus file jika ada
-    if ($media->path && Storage::exists($media->path)) {
-        Storage::delete($media->path);
+    /**
+     * Form edit media program.
+     */
+    public function edit(ProgramMedia $media)
+    {
+        $program = $media->program;
+        return view('admin.program_media.edit', compact('program', 'media'));
     }
 
-    // Hapus record media
-    $media->delete();
+    /**
+     * Hapus media dari program.
+     */
+    public function destroy(ProgramMedia $media)
+    {
+        try {
+            $program = $media->program;
 
-    // Redirect ke halaman show program
-    return redirect()->route('admin.programs.show', ['program' => $program->id])
-                     ->with('success', 'Media berhasil dihapus.');
-}
+            // Hapus file jika ada
+            if ($media->path && Storage::disk('public')->exists($media->path)) {
+                Storage::disk('public')->delete($media->path);
+            }
 
-public function edit(ProgramMedia $media)
-{
-    $program = $media->program; // Ambil program terkait
-    return view('admin.program_media.edit', compact('program', 'media'));
-}
+            // Hapus record dari database
+            $media->delete();
 
-
-
-
+            return redirect()
+                ->route('admin.programs.show', ['program' => $program->id])
+                ->with([
+                    'message' => 'Media berhasil dihapus!',
+                    'alert-type' => 'success'
+                ]);
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.programs.show', ['program' => $program->id ?? null])
+                ->with([
+                    'message' => 'Terjadi kesalahan saat menghapus media!',
+                    'alert-type' => 'error'
+                ]);
+        }
+    }
 }

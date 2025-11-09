@@ -8,7 +8,7 @@
                     <div class="bg-white shadow-lg rounded-xl overflow-hidden">
                         <img src="{{ asset('storage/' . $program->image) }}" 
                              alt="{{ $program->title }}" 
-                             class="w-full h-auto md:h-96 object-cover">
+                             class="w-full  object-cover">
                     </div>
 
                     {{-- Tombol Tab --}}
@@ -67,7 +67,7 @@
                                                 <img src="{{ asset('storage/'.$item->path) }}" alt="{{ $item->caption ?? 'Media Program' }}" 
                                                      class="rounded-lg w-full h-auto object-cover shadow-md">
                                                 @if($item->caption)
-                                                    <p class="text-sm text-center text-gray-600 italic">"{{ $item->caption }}"</p>
+                                                    <p class="text-sm text-center text-gray-600 italic">{{ $item->caption }}</p>
                                                 @endif
                                             </div>
                                         @elseif($item->type === 'video')
@@ -135,7 +135,7 @@
 
                 {{-- SIDEBAR --}}
                 <div class="lg:col-span-1 space-y-6">
-                    <div class="sticky top-28"> 
+                       <div class="sticky top-56 space-y-6">
                         
                         {{-- Progres Donasi --}}
                         <div class="bg-white shadow-lg rounded-xl p-6">

@@ -4,7 +4,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 px-4 space-y-8">
 
             <div>
-              <h2 class="text-3xl font-bold text-gray-900">Program Kebaikan Kami</h2>
+              <h2 class="text-3xl font-bold text-green-800">Program Kebaikan Kami</h2>
               <p class="mt-2 text-gray-600">Jelajahi berbagai program sosial yang dapat Anda dukung untuk menciptakan perubahan nyata.</p>
 
 
@@ -61,7 +61,7 @@
                         <div class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col transition-transform duration-300 hover:scale-[1.03]">
                             
                             <a href="{{ route('programs.show', $program->slug) }}" class="block">
-                                <img src="{{ asset('storage/' . $program->image) }}" alt="{{ $program->title }}" class="w-full h-52 object-cover">
+                                <img src="{{ asset('storage/' . $program->image) }}" alt="{{ $program->title }}" class="w-full h-80 ">
                             </a>
                             
                             <div class="p-5 flex flex-col flex-grow">
