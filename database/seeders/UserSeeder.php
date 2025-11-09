@@ -12,33 +12,26 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        /**
-         * 1️⃣ Permission untuk semua modul di sistem Wali Care
-         */
+        
         $permissions = [
-            // Program Donasi
             'view programs',
             'create programs',
             'edit programs',
             'delete programs',
             'manage programs',
 
-            // Donasi & Transaksi
             'view donations',
             'verify donations',
             'manage transactions',
 
-            // Penerima Manfaat
             'view beneficiaries',
             'create beneficiaries',
             'edit beneficiaries',
             'delete beneficiaries',
 
-            // Laporan & Akuntabilitas
             'view reports',
             'export reports',
 
-            // Manajemen Pengguna
             'manage users',
             'assign roles',
         ];

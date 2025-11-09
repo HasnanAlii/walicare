@@ -4,15 +4,22 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    /**
-     * Display the admin dashboard.
-     */
-    public function index()
-    {
-        // Bisa tambahkan data untuk dashboard nanti, misalnya jumlah users, donations, dsb.
+    
+   public function index()
+{
+    if (!Auth::check()) {
+        return redirect()->route('login');
+    }
+
+    if (Auth::user()->hasRole('Superadmin')) {
         return view('admin.dashboard');
     }
+
+    return view('donor.dashboard');
+}
+
 }

@@ -6,19 +6,26 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Jalankan migrasi.
+     */
     public function up(): void
     {
-        Schema::create('likes', function (Blueprint $table) {
+        Schema::create('mitras', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->morphs('likeable'); 
+            $table->string('name'); 
+            $table->string('url')->nullable(); 
+            $table->string('logo')->nullable(); 
+
             $table->timestamps();
-            $table->unique(['user_id', 'likeable_id', 'likeable_type']);
         });
     }
 
+    /**
+     * Batalkan migrasi.
+     */
     public function down(): void
     {
-        Schema::dropIfExists('likes');
+        Schema::dropIfExists('mitras');
     }
 };

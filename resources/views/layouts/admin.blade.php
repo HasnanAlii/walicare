@@ -66,6 +66,10 @@
                     @endif">
                 <i data-feather="grid"></i> Kategori
             </a>
+
+            <a href="{{ route('admin.mitras.index') }}" class="nav-item @if(request()->routeIs('admin.mitras.*')) active @endif">
+                <i data-feather="users"></i> Mitra
+            </a> 
         </nav>
     </aside>
 
