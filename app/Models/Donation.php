@@ -10,14 +10,16 @@ class Donation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'program_id',
-        'amount',
-        'status',
-        'payment_method',
-        'proof',
-        'verified_at',
+    'program_id',
+    'user_id',
+    'donor_name',
+    'donor_email',
+    'amount',
+    'method',
+    'note',
+    'status',
     ];
+
 
     public function user()
     {

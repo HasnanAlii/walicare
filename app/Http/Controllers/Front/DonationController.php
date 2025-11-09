@@ -10,51 +10,94 @@ use Illuminate\Support\Facades\Auth;
 
 class DonationController extends Controller
 {
-    /**
-     * Simpan donasi baru dari form publik.
-     */
-    public function store(Request $request, Program $program)
-    {
-        // DISESUAIKAN: Validasi disamakan dengan skema dan StoreDonationRequest
-        $data = $request->validate([
-            'program_id' => 'required|exists:programs,id',
-            'amount' => 'required|numeric|min:10000',
-            'donor_name' => 'required|string|max:255',
-            'donor_email' => 'required|email|max:255',
-            'method' => 'required|in:bank_transfer,ewallet,va,manual', // DISESUAIKAN
-            'note' => 'nullable|string', // DISESUAIKAN
-        ]);
+    // /**
+    //  * Simpan donasi baru dari form publik.
+    //  */
+    // public function store(Request $request, Program $program)
+    // {
+    //     // DISESUAIKAN: Validasi disamakan dengan skema dan StoreDonationRequest
+    //     $data = $request->validate([
+    //         'program_id' => 'required|exists:programs,id',
+    //         'amount' => 'required|numeric|min:10000',
+    //         'donor_name' => 'required|string|max:255',
+    //         'donor_email' => 'required|email|max:255',
+    //         'method' => 'required|in:bank_transfer,ewallet,va,manual', // DISESUAIKAN
+    //         'note' => 'nullable|string', // DISESUAIKAN
+    //     ]);
 
-        // Jika user login, kaitkan dengan akunnya
-        if (Auth::check()) {
-            $data['user_id'] = Auth::id();
-        }
+    //     // Jika user login, kaitkan dengan akunnya
+    //     if (Auth::check()) {
+    //         $data['user_id'] = Auth::id();
+    //     }
 
-        // DIHAPUS: Logika 'is_anonymous' dihapus karena tidak ada di skema DB
+    //     // DIHAPUS: Logika 'is_anonymous' dihapus karena tidak ada di skema DB
 
-        // Buat 'Unique Amount' untuk kemudahan verifikasi transfer
-        // Contoh: Donasi 50.000 -> 50.123 (123 adalah 3 digit acak)
-        $uniqueAmount = $data['amount'] + rand(100, 999);
+    //     // Buat 'Unique Amount' untuk kemudahan verifikasi transfer
+    //     // Contoh: Donasi 50.000 -> 50.123 (123 adalah 3 digit acak)
+    //     $uniqueAmount = $data['amount'] + rand(100, 999);
 
-        // Buat donasi
-        // DISESUAIKAN: Field disamakan dengan skema DB
-        $donation = Donation::create([
-            'program_id' => $program->id,
-            'user_id' => $data['user_id'] ?? null,
-            'donor_name' => $data['donor_name'],
-            'donor_email' => $data['donor_email'],
-            'amount' => $uniqueAmount, // Simpan jumlah unik
-            'method' => $data['method'], // DISESUAIKAN
-            'note' => $data['note'] ?? null, // DISESUAIKAN
-            'status' => 'pending', // Status awal
-        ]);
+    //     // Buat donasi
+    //     // DISESUAIKAN: Field disamakan dengan skema DB
+    //     $donation = Donation::create([
+    //         'program_id' => $program->id,
+    //         'user_id' => $data['user_id'] ?? null,
+    //         'donor_name' => $data['donor_name'],
+    //         'donor_email' => $data['donor_email'],
+    //         'amount' => $uniqueAmount, // Simpan jumlah unik
+    //         'method' => $data['method'], // DISESUAIKAN
+    //         'note' => $data['note'] ?? null, // DISESUAIKAN
+    //         'status' => 'confirmed', // Status awal
+    //     ]);
 
-        // TODO: Implementasikan logika Payment Gateway (Midtrans, dll) di sini jika ada.
-        // Jika tidak, kita arahkan ke halaman konfirmasi manual.
+    //     // TODO: Implementasikan logika Payment Gateway (Midtrans, dll) di sini jika ada.
+    //     // Jika tidak, kita arahkan ke halaman konfirmasi manual.
 
-        // Redirect ke halaman konfirmasi dengan membawa data donasi
-        return redirect()->route('donations.confirmation', $donation->id);
+    //     // Redirect ke halaman konfirmasi dengan membawa data donasi
+    //     return redirect()->route('donations.confirmation', $donation->id);
+    // }
+
+
+public function store(Request $request, Program $program)
+{
+    // ✅ Validasi input
+    $request->validate([
+        'amount' => 'required|numeric|min:10000',
+        'donor_name' => 'required|string|max:255',
+        'donor_email' => 'required|email|max:255',
+        'method' => 'required|in:bank_transfer,ewallet,va,manual',
+        'note' => 'nullable|string',
+    ]);
+
+    // ✅ Nominal unik untuk simulasi realistis
+    $uniqueAmount = $request->amount + rand(100, 999);
+
+    // ✅ Simpan donasi baru
+    $donation = Donation::create([
+        'program_id'  => $program->id,
+        'user_id'     => Auth::id(), // null jika tidak login
+        'donor_name'  => $request->donor_name,
+        'donor_email' => $request->donor_email,
+        'amount'      => $uniqueAmount,
+        'method'      => $request->method,
+        'note'        => $request->note,
+        'status'      => 'confirmed', // langsung confirmed
+    ]);
+
+    // ✅ Update total donasi terkumpul di program
+    $program->increment('collected_amount', $uniqueAmount);
+
+    // ✅ (Opsional) Update status program jika target tercapai
+    if ($program->collected_amount >= $program->target_amount) {
+        $program->update(['status' => 'completed']);
     }
+
+    // ✅ Redirect ke halaman konfirmasi donasi
+    return redirect()
+        ->route('donations.confirmation', $donation->id)
+        ->with('success', 'Terima kasih! Donasi Anda telah berhasil dikonfirmasi.');
+}
+
+
 
     /**
      * Tampilkan halaman konfirmasi setelah membuat donasi.

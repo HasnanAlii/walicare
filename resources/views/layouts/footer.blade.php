@@ -45,13 +45,13 @@
                 <h4 class="text-sm font-semibold text-white tracking-wider uppercase">Bantuan</h4>
                 <ul class="mt-4 space-y-3">
                     <li>
-                        <a href="#" class="text-base text-gray-200 hover:text-white transition">Pusat Bantuan (FAQ)</a>
+                        <a class="text-base text-gray-200 hover:text-white transition">Pusat Bantuan (FAQ)</a>
                     </li>
                     <li>
-                        <a href="#" class="text-base text-gray-200 hover:text-white transition">Kebijakan Privasi</a>
+                        <a class="text-base text-gray-200 hover:text-white transition">Kebijakan Privasi</a>
                     </li>
                     <li>
-                        <a href="#" class="text-base text-gray-200 hover:text-white transition">Syarat & Ketentuan</a>
+                        <a class="text-base text-gray-200 hover:text-white transition">Syarat & Ketentuan</a>
                     </li>
                 </ul>
             </div>
@@ -62,25 +62,25 @@
                     Ikuti kami di media sosial:
                 </p>
                 <div class="mt-4 flex space-x-4">
-                    <a href="#" class="text-gray-200 hover:text-white transition">
+                    {{-- <a href="#" class="text-gray-200 hover:text-white transition">
                         <span class="sr-only">Facebook</span>
                         <i data-feather="facebook" class="w-6 h-6"></i>
-                    </a>
-                    <a href="#" class="text-gray-200 hover:text-white transition">
+                    </a> --}}
+                    <a href="https://www.instagram.com/walicare/"  target="_blank"  class="text-gray-200 hover:text-white transition">
                         <span class="sr-only">Instagram</span>
                         <i data-feather="instagram" class="w-6 h-6"></i>
                     </a>
-                    <a href="#" class="text-gray-200 hover:text-white transition">
+                    <a href="https://x.com/walicare"  target="_blank"  class="text-gray-200 hover:text-white transition">
                         <span class="sr-only">Twitter</span>
                         <i data-feather="twitter" class="w-6 h-6"></i>
                     </a>
-                    <a href="#" class="text-gray-200 hover:text-white transition">
+                    <a href="https://www.youtube.com/channel/UCtyTY8d_YHFUEGKv-hmWkRQ/videos?view=0&sort=dd&shelf_id=0"   target="_blank"  class="text-gray-200 hover:text-white transition">
                         <span class="sr-only">YouTube</span>
                         <i data-feather="youtube" class="w-6 h-6"></i>
                     </a>
                 </div>
                 <p class="mt-6 text-sm text-gray-200">
-                    Email: <a href="mailto:info@walicare.id" class="hover:text-white hover:underline">info@walicare.id</a>
+                    Email: <a href="mailto:walicare.file@gmail.com"  class="hover:text-white hover:underline">walicare.file@gmail.com</a>
                 </p>
             </div>
 

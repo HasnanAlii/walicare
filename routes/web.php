@@ -54,11 +54,13 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('donor')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/donations', [DashboardController::class, 'donations'])->name('donations');
-        Route::post('/donations', [DonationController::class, 'store'])->name('donations.store');
+        Route::post('/donations/{program:slug}', [DonationController::class, 'store'])->name('donations.store');
         Route::get('/donation/confirmation/{donation}', [DonationController::class, 'confirmation'])->name('donations.confirmation');
     });
 
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+        Route::get('/programs/{program:slug}', [ProgramController::class, 'show'])->name('programs.show');
+
 });
 
        
@@ -72,6 +74,8 @@ Route::middleware(['auth', 'role:Superadmin'])->prefix('admin')->name('admin.')-
         Route::resource('events', EventController::class);
 
         Route::resource('mitras', MitraController::class);
+
+
 
         Route::resource('programs', AdminProgramController::class)->middleware('permission:manage programs');
 

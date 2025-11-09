@@ -1,8 +1,8 @@
 <x-guest-layout>
     <div class="py-12 bg-gray-50">
-        {{-- Lebar diubah menjadi 3xl untuk halaman detail --}}
         <div class="max-w-3xl mx-auto px-4 space-y-6"> 
             
+            {{-- Tombol Kembali --}}
             <div class="mb-4">
                 <a href="{{ route('events.index') }}" 
                    class="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition">
@@ -11,6 +11,7 @@
                 </a>
             </div>
 
+            {{-- Kartu Detail Event --}}
             <div id="event-card-{{ $event->id }}" class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col w-full">
                 
                 {{-- Header Postingan --}}
@@ -22,17 +23,17 @@
                     </div>
                 </div>
 
-                {{-- Gambar (Jika ada) dipindah ke bawah header --}}
+                {{-- Gambar Event --}}
                 @if($event->image)
                     <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->title }}" class="w-full h-auto max-h-[500px] object-cover">
                 @endif
 
-                {{-- Konten Postingan --}}
+                {{-- Konten Event --}}
                 <div class="p-4 sm:p-6">
-                     <h1 class="font-bold text-2xl text-gray-900 mb-4">{{ $event->title }}</h1>
+                    <h1 class="font-bold text-2xl text-gray-900 mb-4">{{ $event->title }}</h1>
                      
-                     {{-- Info Detail (Tanggal & Lokasi) --}}
-                     <div class="flex items-center gap-6 text-sm text-gray-500 mb-4">
+                    {{-- Info Detail (Tanggal & Lokasi) --}}
+                    <div class="flex items-center gap-6 text-sm text-gray-500 mb-4">
                         <span class="flex items-center gap-2">
                             <i data-feather="calendar" class="w-4 h-4"></i>
                             {{ $event->start_date?->format('d M Y') }}
@@ -41,14 +42,14 @@
                             <i data-feather="map-pin" class="w-4 h-4"></i>
                             {{ $event->location ?? 'Online' }}
                         </span>
-                     </div>
+                    </div>
 
-                     {{-- Deskripsi Lengkap (Gunakan 'prose' untuk styling) --}}
-                     <div class="prose max-w-none text-gray-700 mb-6">
-                        {!! $event->description !!} {{-- Menggunakan {!! !!} jika deskripsi Anda berisi HTML --}}
-                     </div>
+                    {{-- Deskripsi Event --}}
+                    <div class="prose max-w-none text-gray-700 mb-6">
+                        {!! $event->description !!}
+                    </div>
 
-                     {{-- Baris Statistik (Like & Komentar) --}}
+                    {{-- Statistik Like & Komentar --}}
                     <div class="flex justify-between text-sm text-gray-500 mb-3 pt-4 border-t">
                         <span id="likes-count-{{ $event->id }}">
                             <i data-feather="thumbs-up" class="w-4 h-4 inline-block -mt-px mr-1"></i>
@@ -60,8 +61,9 @@
                         </span>
                     </div>
 
-                    {{-- Tombol Aksi (Like & Komentar) --}}
-                    <div class="grid grid-cols-2 gap-2 text-center border-t pt-2">
+                    {{-- Tombol Aksi --}}
+                    <div class="grid grid-cols-3 gap-2 text-center border-t pt-2">
+                        {{-- Tombol Suka --}}
                         <button 
                             data-event-id="{{ $event->id }}"
                             class="like-button w-full flex justify-center items-center gap-2 py-2 font-medium hover:bg-gray-100 rounded-lg transition
@@ -70,43 +72,140 @@
                             <span class="like-text">{{ $event->is_liked_by_user ? 'Disukai' : 'Suka' }}</span>
                         </button>
                         
+                        {{-- Tombol Komentar --}}
                         <a href="#comments" 
                            class="w-full flex justify-center items-center gap-2 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition">
                             <i data-feather="message-square" class="w-5 h-5"></i>
                             <span>Komentar</span>
                         </a>
+
+                        {{-- Tombol Bagikan --}}
+                        <button 
+                            onclick="shareEvent(
+                                '{{ route('events.show', $event->slug) }}', 
+                                '{{ $event->title }}', 
+                                '{{ Str::limit($event->summary, 150) }}', 
+                                '{{ asset('storage/' . $event->image) }}'
+                            )"
+                            class="w-full flex justify-center items-center gap-2 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition">
+                            <i data-feather="share-2" class="w-5 h-5"></i>
+                            Bagikan
+                        </button>
                     </div>
                 </div>
-            </div> <div id="comments" class="bg-white shadow-lg rounded-xl p-4 sm:p-6">
+            </div> 
+
+            {{-- Script Share --}}
+            <script>
+                function shareEvent(url, title, description, imageUrl) {
+                    const defaultTitle = 'Kegiatan Wali Care';
+                    const defaultDesc = 'Lihat kegiatan inspiratif dari Wali Care yang penuh kepedulian!';
+                    
+                    const shareTitle = title || defaultTitle;
+                    const shareDesc = description || defaultDesc;
+
+                    if (navigator.canShare && navigator.canShare({ files: [] }) && imageUrl) {
+                        fetch(imageUrl)
+                            .then(res => res.blob())
+                            .then(blob => {
+                                const file = new File([blob], 'walicare-event.jpg', { type: blob.type });
+                                navigator.share({
+                                    title: shareTitle,
+                                    text: shareDesc,
+                                    files: [file],
+                                    url: url
+                                }).catch(err => console.log('Gagal membagikan file:', err));
+                            })
+                            .catch(err => {
+                                console.log('Gagal fetch gambar, fallback ke share teks:', err);
+                                shareTextOnly(url, shareTitle, shareDesc);
+                            });
+                    } else if (navigator.share) {
+                        shareTextOnly(url, shareTitle, shareDesc);
+                    } else {
+                        showDesktopShareModal(url, shareTitle, shareDesc);
+                    }
+                }
+
+                function shareTextOnly(url, title, text) {
+                    navigator.share({
+                        title: title,
+                        text: text,
+                        url: url
+                    }).catch(err => console.log('Gagal membagikan teks:', err));
+                }
+
+                function showDesktopShareModal(url, title, description) {
+                    closeShareModal(); 
+                    const modal = `
+                        <div id="share-modal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                            <div class="bg-white rounded-xl shadow-lg w-full max-w-sm p-6 text-center">
+                                <h3 class="text-lg font-semibold mb-4">Bagikan Event Ini</h3>
+                                <div class="flex justify-around text-green-600 mb-5">
+                                    <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(description)}" target="_blank" class="p-2 hover:bg-gray-100 rounded-full" title="Bagikan ke Facebook">
+                                        <i data-feather='facebook' class="w-6 h-6"></i>
+                                    </a>
+                                    <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(description)}" target="_blank" class="p-2 hover:bg-gray-100 rounded-full" title="Bagikan ke X (Twitter)">
+                                        <i data-feather='twitter' class="w-6 h-6"></i>
+                                    </a>
+                                    <button onclick="copyLink('${url}')" class="p-2 hover:bg-gray-100 rounded-full" title="Salin tautan">
+                                        <i data-feather='copy' class="w-6 h-6"></i>
+                                    </button>
+                                </div>
+                                <button onclick="closeShareModal()" class="mt-4 text-sm text-gray-500 hover:text-gray-700">Tutup</button>
+                            </div>
+                        </div>
+                    `;
+                    document.body.insertAdjacentHTML('beforeend', modal);
+                    feather.replace();
+                }
+
+                function closeShareModal() {
+                    document.getElementById('share-modal')?.remove();
+                }
+
+                function copyLink(url) {
+                    navigator.clipboard.writeText(url).then(() => {
+                        alert('📋 Link berhasil disalin ke clipboard!');
+                    });
+                }
+
+                document.addEventListener('DOMContentLoaded', () => {
+                    if (typeof feather !== 'undefined') feather.replace();
+                });
+            </script>
+
+            {{-- Komentar --}}
+            <div id="comments" class="bg-white shadow-lg rounded-xl p-4 sm:p-6">
                 <h2 class="text-xl font-bold text-gray-900 mb-4">
                     Komentar ({{ $event->comments_count ?? 0 }})
                 </h2>
 
                 @auth
-                <form action="{{ route('events.comment', $event) }}" method="POST" class="flex items-start gap-3 border-b pb-4 mb-4">
-                    @csrf
-                    <img class="w-10 h-10 rounded-full object-cover" 
-                         src="{{ Auth::user()->profile_photo_url ?? asset('storage/logo.jpg') }}" 
-                         alt="{{ Auth::user()->name }}">
-                    <div class="flex-1">
-                        <textarea name="body" rows="3" 
-                                  class="w-full border-gray-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500" 
-                                  placeholder="Tulis komentar Anda..." required></textarea>
-                        @error('body')
-                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
-                        @enderror
-                        <button type="submit" 
-                                class="mt-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg shadow hover:bg-green-700 transition">
-                            Kirim
-                        </button>
-                    </div>
-                </form>
+                    <form action="{{ route('events.comment', $event) }}" method="POST" class="flex items-start gap-3 border-b pb-4 mb-4">
+                        @csrf
+                        <img class="w-10 h-10 rounded-full object-cover" 
+                             src="{{ Auth::user()->profile_photo_url ?? asset('storage/logo.jpg') }}" 
+                             alt="{{ Auth::user()->name }}">
+                        <div class="flex-1">
+                            <textarea name="body" rows="3" 
+                                      class="w-full border-gray-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500" 
+                                      placeholder="Tulis komentar Anda..." required></textarea>
+                            @error('body')
+                                <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                            @enderror
+                            <button type="submit" 
+                                    class="mt-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg shadow hover:bg-green-700 transition">
+                                Kirim
+                            </button>
+                        </div>
+                    </form>
                 @else
-                <div class="border-b pb-4 mb-4 text-center">
-                    <p class="text-gray-600">
-                        <a href="{{ route('login') }}" class="text-green-600 font-semibold hover:underline">Masuk</a> untuk menulis komentar.
-                    </p>
-                </div>
+                    <div class="border-b pb-4 mb-4 text-center">
+                        <p class="text-gray-600">
+                            <a href="{{ route('login') }}" class="text-green-600 font-semibold hover:underline">Masuk</a> untuk menulis komentar.
+                        </p>
+                    </div>
                 @endauth
                 
                 <div class="space-y-5">
@@ -124,76 +223,74 @@
                             </div>
                         </div>
                     @empty
-                        <p classM="text-gray-500 text-center py-4">Belum ada komentar.</p>
+                        <p class="text-gray-500 text-center py-4">Belum ada komentar.</p>
                     @endforelse
                 </div>
 
                 @if($comments->hasPages())
-                <div class="mt-6">
-                    {{ $comments->links() }}
-                </div>
+                    <div class="mt-6">
+                        {{ $comments->links() }}
+                    </div>
                 @endif
-
-            </div> </div>
+            </div>
+        </div>
     </div>
 
-    {{-- Script untuk tombol 'Like' (Sama seperti di index) --}}
+    {{-- Script untuk tombol Like --}}
     @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const likeButton = document.querySelector('.like-button');
-            if (!likeButton) return; // Hentikan jika tombol tidak ada
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const likeButton = document.querySelector('.like-button');
+                if (!likeButton) return;
 
-            likeButton.addEventListener('click', function () {
-                const eventId = this.dataset.eventId;
-                const url = `/like/event/${eventId}`;
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                likeButton.addEventListener('click', function () {
+                    const eventId = this.dataset.eventId;
+                    const url = `/like/event/${eventId}`;
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => {
-                    if (response.status === 401 || response.status === 403) {
-                         window.location.href = '{{ route('login') }}';
-                         return;
-                    }
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data) {
-                        // Update jumlah 'like'
-                        const countSpan = document.getElementById(`likes-count-${eventId}`);
-                        if (countSpan) {
-                            countSpan.innerHTML = `<i data-feather="thumbs-up" class="w-4 h-4 inline-block -mt-px mr-1"></i> ${data.likes_count} Suka`;
-                            feather.replace(); 
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
                         }
-
-                        // Update tampilan tombol
-                        const textSpan = this.querySelector('.like-text');
-                        if (data.is_liked) {
-                            this.classList.remove('text-gray-600');
-                            this.classList.add('text-green-600');
-                            textSpan.textContent = 'Disukai';
-                        } else {
-                            this.classList.remove('text-green-600');
-                            this.classList.add('text-gray-600');
-                            textSpan.textContent = 'Suka';
+                    })
+                    .then(response => {
+                        if (response.status === 401 || response.status === 403) {
+                            window.location.href = '{{ route('login') }}';
+                            return;
                         }
-                    }
-                })
-                .catch(error => {
-                    console.error('Error toggling like:', error);
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data) {
+                            const countSpan = document.getElementById(`likes-count-${eventId}`);
+                            if (countSpan) {
+                                countSpan.innerHTML = `<i data-feather="thumbs-up" class="w-4 h-4 inline-block -mt-px mr-1"></i> ${data.likes_count} Suka`;
+                                feather.replace();
+                            }
+
+                            const textSpan = this.querySelector('.like-text');
+                            if (data.is_liked) {
+                                this.classList.remove('text-gray-600');
+                                this.classList.add('text-green-600');
+                                textSpan.textContent = 'Disukai';
+                            } else {
+                                this.classList.remove('text-green-600');
+                                this.classList.add('text-gray-600');
+                                textSpan.textContent = 'Suka';
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error toggling like:', error);
+                    });
                 });
             });
-        });
-    </script>
+        </script>
     @endpush
 </x-guest-layout>

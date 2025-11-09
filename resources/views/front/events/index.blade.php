@@ -50,21 +50,38 @@
                                 </div>
 
                                 {{-- Tombol --}}
-                                <div class="grid grid-cols-2 gap-2 text-center border-t pt-2">
-                                    <button 
-                                        data-event-id="{{ $event->id }}"
-                                        class="like-button w-full flex justify-center items-center gap-2 py-2 font-medium hover:bg-gray-100 rounded-lg transition
-                                               {{ $event->is_liked_by_user ? 'text-green-600' : 'text-gray-600' }}">
-                                        <i data-feather="thumbs-up" class="w-5 h-5"></i>
-                                        <span class="like-text">{{ $event->is_liked_by_user ? 'Disukai' : 'Suka' }}</span>
-                                    </button>
-                                    
-                                    <a href="{{ route('events.show', $event->slug) }}#comments"
-                                       class="w-full flex justify-center items-center gap-2 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition">
-                                        <i data-feather="message-square" class="w-5 h-5"></i>
-                                        <span>Komentar</span>
-                                    </a>
-                                </div>
+                               <div class="grid grid-cols-3 gap-2 text-center border-t pt-2">
+                                {{-- Tombol Suka --}}
+                                <button 
+                                    data-event-id="{{ $event->id }}"
+                                    class="like-button w-full flex justify-center items-center gap-2 py-2 font-medium hover:bg-gray-100 rounded-lg transition
+                                        {{ $event->is_liked_by_user ? 'text-green-600' : 'text-gray-600' }}">
+                                    <i data-feather="thumbs-up" class="w-5 h-5"></i>
+                                    <span class="like-text">{{ $event->is_liked_by_user ? 'Disukai' : 'Suka' }}</span>
+                                </button>
+
+                                {{-- Tombol Komentar --}}
+                                <a href="{{ route('events.show', $event->slug) }}#comments"
+                                class="w-full flex justify-center items-center gap-2 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition">
+                                    <i data-feather="message-square" class="w-5 h-5"></i>
+                                    <span>Komentar</span>
+                                </a>
+
+                                {{-- Tombol Bagikan --}}
+                                 <button 
+                                    onclick="shareEvent(
+                                        '{{ route('events.show', $event->slug) }}', 
+                                        '{{ $event->title }}', 
+                                        '{{ Str::limit($event->summary, 150) }}', 
+                                        '{{ asset('storage/' . $event->image) }}'
+                                    )"
+                                    class="w-full flex justify-center items-center gap-2 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition">
+                                    <i data-feather="share-2" class="w-5 h-5"></i>
+                                    Bagikan
+                                </button>
+                            </div>
+               
+
                             </div>
                         </div>
                     @empty
@@ -203,4 +220,98 @@
         });
     </script>
     @endpush
+
+
+     <script>
+                    function shareEvent(url, title, description, imageUrl) {
+                        const defaultTitle = 'Kegiatan Wali Care';
+                        const defaultDesc = 'Lihat kegiatan inspiratif dari Wali Care yang penuh kepedulian!';
+                        
+                        // Gunakan default jika title/desc kosong
+                        const shareTitle = title || defaultTitle;
+                        const shareDesc = description || defaultDesc;
+
+                        // 📱 A. Jika browser mendukung file sharing (image)
+                        if (navigator.canShare && navigator.canShare({ files: [] }) && imageUrl) {
+                            fetch(imageUrl)
+                                .then(res => res.blob())
+                                .then(blob => {
+                                    const file = new File([blob], 'walicare-event.jpg', { type: blob.type });
+                                    navigator.share({
+                                        title: shareTitle,
+                                        text: shareDesc,
+                                        files: [file],
+                                        url: url
+                                    }).catch(err => console.log('Gagal membagikan file:', err));
+                                })
+                                .catch(err => {
+                                    console.log('Gagal fetch gambar, fallback ke share teks:', err);
+                                    shareTextOnly(url, shareTitle, shareDesc);
+                                });
+
+                        // 📱 B. Jika hanya bisa share teks
+                        } else if (navigator.share) {
+                            shareTextOnly(url, shareTitle, shareDesc);
+
+                        // 💻 C. Fallback untuk Desktop (Modal)
+                        } else {
+                            showDesktopShareModal(url, shareTitle, shareDesc);
+                        }
+                    }
+
+                    // Fungsi helper untuk share teks saja
+                    function shareTextOnly(url, title, text) {
+                        navigator.share({
+                            title: title,
+                            text: text,
+                            url: url
+                        }).catch(err => console.log('Gagal membagikan teks:', err));
+                    }
+
+                    // Fungsi modal untuk Desktop
+                    function showDesktopShareModal(url, title, description) {
+                        closeShareModal(); // pastikan modal lama ditutup
+
+                        const modal = `
+                            <div id="share-modal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+                                <div class="bg-white rounded-xl shadow-lg w-full max-w-sm p-6 text-center">
+                                    <h3 class="text-lg font-semibold mb-4">Bagikan Event Ini</h3>
+                                    <div class="flex justify-around text-green-600 mb-5">
+                                        <!-- Facebook -->
+                                        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(description)}" target="_blank" class="p-2 hover:bg-gray-100 rounded-full" title="Bagikan ke Facebook">
+                                            <i data-feather='facebook' class="w-6 h-6"></i>
+                                        </a>
+                                        <!-- Twitter / X -->
+                                        <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(description)}" target="_blank" class="p-2 hover:bg-gray-100 rounded-full" title="Bagikan ke X (Twitter)">
+                                            <i data-feather='twitter' class="w-6 h-6"></i>
+                                        </a>
+                                        <!-- Copy Link -->
+                                        <button onclick="copyLink('${url}')" class="p-2 hover:bg-gray-100 rounded-full" title="Salin tautan">
+                                            <i data-feather='copy' class="w-6 h-6"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <button onclick="closeShareModal()" class="mt-4 text-sm text-gray-500 hover:text-gray-700">Tutup</button>
+                                </div>
+                            </div>
+                        `;
+                        document.body.insertAdjacentHTML('beforeend', modal);
+                        feather.replace();
+                    }
+
+                    function closeShareModal() {
+                        document.getElementById('share-modal')?.remove();
+                    }
+
+                    function copyLink(url) {
+                        navigator.clipboard.writeText(url).then(() => {
+                            alert('📋 Link berhasil disalin ke clipboard!');
+                        });
+                    }
+
+                    // Jalankan Feather Icons setelah halaman dimuat
+                    document.addEventListener('DOMContentLoaded', () => {
+                        if (typeof feather !== 'undefined') feather.replace();
+                    });
+                    </script>
 </x-guest-layout>

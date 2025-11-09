@@ -133,16 +133,19 @@ public function destroy(Program $program)
 
  public function show(Program $program)
 {
-    // Load kategori dan media
     $program->load(['category', 'media']);
 
-    // Decode breakdown JSON jika ada
     $breakdown = $program->breakdown ? json_decode($program->breakdown, true) : [];
 
-    // Kirim media ke view
     $media = $program->media;
+    $recentDonations = $program->donations()
+    ->where('status', 'confirmed')
+    ->latest()
+    ->take(15)
+    ->get();
 
-    return view('admin.programs.show', compact('program', 'breakdown', 'media'));
+
+    return view('admin.programs.show', compact('program', 'recentDonations','breakdown', 'media'));
 }
 
 

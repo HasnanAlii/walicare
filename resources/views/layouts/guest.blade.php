@@ -19,6 +19,24 @@
     
 
     @stack('styles')
+
+    @php
+        $defaultTitle = 'Wali Care - Platform Donasi Aman dan Transparan';
+        $defaultDesc = 'Bantu wujudkan harapan mereka melalui donasi online yang mudah dan terpercaya bersama Wali Care.';
+        $defaultImage = asset('storage/logo.jpg'); 
+    @endphp
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request()->url() }}">
+    <meta property="og:title" content="{{ $ogTitle ?? $defaultTitle }}">
+    <meta property="og:description" content="{{ $ogDescription ?? $defaultDesc }}">
+    <meta property="og:image" content="{{ $ogImage ?? $defaultImage }}">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="{{ request()->url() }}">
+    <meta name="twitter:title" content="{{ $ogTitle ?? $defaultTitle }}">
+    <meta name="twitter:description" content="{{ $ogDescription ?? $defaultDesc }}">
+    <meta name="twitter:image" content="{{ $ogImage ?? $defaultImage }}">
 </head>
 <body class="font-sans antialiased">
 

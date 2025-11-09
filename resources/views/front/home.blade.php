@@ -238,7 +238,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-16">
 
             {{-- Aksi Kemanusiaan Palestina --}}
-            <div>
+            {{-- <div>
                 <div class="text-center mb-12">
                     <h2 class="text-3xl font-bold text-gray-900">
                         Aksi Kami di Lapangan
@@ -252,11 +252,11 @@
                     <img src="{{ asset('storage/2.png') }}" class="rounded-xl shadow-lg object-cover w-full h-72">
                     <img src="{{ asset('storage/3.png') }}" class="rounded-xl shadow-lg object-cover w-full h-72">
                 </div>
-            </div>
+            </div> --}}
 
             {{-- Sertifikat NGO --}}
-            <div>
-                <div class="text-center mb-12">
+            <div class="py-12">
+                <div class="text-center mb-12 px-4 sm:px-6 lg:px-8">
                     <h2 class="text-3xl font-bold text-gray-900">
                         Legalitas & Kepercayaan
                     </h2>
@@ -264,11 +264,21 @@
                         Kami adalah lembaga yang terdaftar dan diakui, memastikan donasi Anda dikelola secara amanah dan profesional.
                     </p>
                 </div>
-                <div class="grid md:grid-cols-2 gap-6">
-                    <img src="{{ asset('storage/s1.png') }}" alt="Certificate 1" class="rounded-xl shadow-lg object-cover w-full h-96">
-                    <img src="{{ asset('storage/s2.png') }}" alt="Certificate 2" class="rounded-xl shadow-lg object-cover w-full h-96">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-center">
+                        <img src="{{ asset('storage/s1.png') }}" 
+                            alt="Sertifikat Legalitas 1" 
+                            class="rounded-xl shadow-lg object-contain w-full max-w-sm sm:max-w-md h-auto">
+                    </div>
+                    <div class="flex justify-center">
+                        <img src="{{ asset('storage/s2.png') }}" 
+                            alt="Sertifikat Legalitas 2" 
+                            class="rounded-xl shadow-lg object-contain w-full max-w-sm sm:max-w-md h-auto">
+                    </div>
                 </div>
             </div>
+
 
         </div>
     </div>
@@ -284,8 +294,8 @@
             </p>
             <a href="{{ route('programs.index') }}" 
                class="mt-8 inline-flex items-center justify-center rounded-lg bg-green-600 px-6 py-3 text-base font-medium text-white shadow-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition">
-               <i data-feather="heart" class="w-5 h-5 mr-2"></i>
                 Lihat Semua Program
+                
             </a>
         </div>
     </div>

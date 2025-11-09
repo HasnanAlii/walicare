@@ -1,4 +1,4 @@
-<section class="space-y-6">
+<section class="space-y-6 bg-white shadow-lg rounded-lg overflow-hidden p-5">
     <header>
         <h2 class="text-lg font-bold text-green-900">
             Hapus Akun

@@ -22,6 +22,10 @@ class Program extends Model
         'end_date' => 'date',
         'is_featured' => 'boolean'
     ];
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 
     public function category()
     {

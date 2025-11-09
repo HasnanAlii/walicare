@@ -230,13 +230,63 @@
                         </div>
                     </div>
 
-                    <div x-show="tab === 'donatur'" x-transition x-cloak>
-                        <div class="bg-white p-12 rounded-lg shadow border border-gray-200 text-center">
-                            <i data-feather="users" class="w-16 h-16 text-gray-400 mx-auto mb-4"></i>
-                            <h3 class="text-xl font-semibold text-gray-700">Fitur Donatur</h3>
-                            <p class="text-gray-500 mt-2">Daftar donatur untuk program ini akan ditampilkan di sini.</p>
-                        </div>
+                  <div x-show="tab === 'donatur'" 
+     x-transition 
+     x-cloak
+     class="bg-white shadow-lg rounded-xl p-6 md:p-8">
+
+    <h2 class="text-2xl font-bold text-gray-900 mb-4 border-b border-gray-200 pb-3">
+        Donatur ({{ $recentDonations->count() }})
+    </h2>
+
+    @if($recentDonations->count())
+        <ul class="space-y-4 max-h-96 overflow-y-auto pr-2">
+            @foreach($recentDonations as $donation)
+                <li class="flex items-center space-x-4 p-2 hover:bg-gray-50 rounded-lg transition">
+                    
+                    {{-- Foto profil --}}
+                    <div class="flex-shrink-0">
+                        @if($donation->user && $donation->user->profile_photo)
+                            <img src="{{ asset('storage/' . $donation->user->profile_photo) }}" 
+                                 alt="{{ $donation->user->name }}" 
+                                 class="h-10 w-10 rounded-full object-cover border border-gray-200 shadow-sm">
+                        @elseif($donation->user && method_exists($donation->user, 'profile_photo_url'))
+                            <img src="{{ $donation->user->profile_photo_url }}" 
+                                 alt="{{ $donation->user->name }}" 
+                                 class="h-10 w-10 rounded-full object-cover border border-gray-200 shadow-sm">
+                        @else
+                            <div class="bg-gray-100 rounded-full h-10 w-10 flex items-center justify-center">
+                                <i data-feather="user" class="w-5 h-5 text-gray-500"></i>
+                            </div>
+                        @endif
                     </div>
+
+                    {{-- Info donatur --}}
+                    <div class="flex-1 text-left">
+                        <p class="font-semibold text-gray-800">
+                            {{ $donation->is_anonymous ? 'Donatur Anonim' : $donation->donor_name }}
+                        </p>
+                        <p class="text-sm text-gray-500">
+                            {{ $donation->created_at->diffForHumans() }}
+                        </p>
+                    </div>
+
+                    {{-- Nominal --}}
+                    <span class="text-lg font-bold text-green-600 whitespace-nowrap">
+                        Rp {{ number_format($donation->amount, 0, ',', '.') }}
+                    </span>
+                </li>
+            @endforeach
+        </ul>
+    @else
+        <div class="text-center py-12">
+            <i data-feather="users" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-700">Belum Ada Donatur</h3>
+            <p class="text-gray-500 mt-2">Jadilah donatur pertama untuk program ini!</p>
+        </div>
+    @endif
+</div>
+
                 </div>
             </div>
         </div>
