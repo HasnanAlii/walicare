@@ -77,32 +77,22 @@ class ProgramMediaController extends Controller
     /**
      * Hapus media dari program.
      */
-    public function destroy(ProgramMedia $media)
+  public function destroy(ProgramMedia $media)
     {
-        try {
             $program = $media->program;
 
-            // Hapus file jika ada
             if ($media->path && Storage::disk('public')->exists($media->path)) {
                 Storage::disk('public')->delete($media->path);
             }
 
-            // Hapus record dari database
             $media->delete();
 
             return redirect()
-                ->route('admin.programs.show', ['program' => $program->id])
+                   ->back()
                 ->with([
-                    'message' => 'Media berhasil dihapus!',
+                    'message' => 'Kabar atau media berhasil dihapus!',
                     'alert-type' => 'success'
                 ]);
-        } catch (\Exception $e) {
-            return redirect()
-                ->route('admin.programs.show', ['program' => $program->id ?? null])
-                ->with([
-                    'message' => 'Terjadi kesalahan saat menghapus media!',
-                    'alert-type' => 'error'
-                ]);
-        }
+       
     }
 }

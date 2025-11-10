@@ -95,9 +95,9 @@ class ProgramController extends Controller
     /**
      * Perbarui data program.
      */
-    public function update(Request $request, Program $program)
+public function update(Request $request, Program $program)
 {
-    // Validasi manual seperti di store()
+    // 🔍 Validasi input
     $validated = $request->validate([
         'category_id' => ['nullable', 'exists:program_categories,id'],
         'title' => ['required', 'string', 'max:255', 'unique:programs,title,' . $program->id],
@@ -106,7 +106,6 @@ class ProgramController extends Controller
         'description' => ['nullable', 'string'],
         'target_amount' => ['required'],
         'collected_amount' => ['nullable'],
-        'breakdown' => ['nullable', 'array'],
         'status' => ['required', 'in:draft,active,completed,cancelled'],
         'start_date' => ['nullable', 'date'],
         'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
@@ -115,26 +114,26 @@ class ProgramController extends Controller
         'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:15120'],
     ]);
 
-    // Bersihkan angka dari titik (contoh: "10.000" → "10000")
-    $validated['target_amount'] = str_replace('.', '', $validated['target_amount']);
-    $validated['collected_amount'] = str_replace('.', '', $validated['collected_amount'] ?? 0);
+    // 🔢 Bersihkan angka dari format ribuan (contoh: "10.000" → "10000")
+    $validated['target_amount'] = (int) str_replace('.', '', $validated['target_amount']);
+    $validated['collected_amount'] = (int) str_replace('.', '', $validated['collected_amount'] ?? 0);
 
-    // Upload gambar baru jika ada
+   
+
+    // 🖼️ Upload gambar baru (hapus lama jika ada)
     if ($request->hasFile('image')) {
-        // Hapus gambar lama
         if ($program->image && Storage::disk('public')->exists($program->image)) {
             Storage::disk('public')->delete($program->image);
         }
-        // Simpan gambar baru
         $validated['image'] = $request->file('image')->store('programs', 'public');
     }
 
-    // Slug otomatis jika kosong
+    // 🧩 Buat slug otomatis jika kosong
     if (empty($validated['slug'])) {
         $validated['slug'] = Str::slug($validated['title']);
     }
 
-    // Update data
+    // 💾 Simpan perubahan ke database
     $program->update($validated);
 
     return redirect()
@@ -143,8 +142,8 @@ class ProgramController extends Controller
             'message' => 'Program berhasil diperbarui!',
             'alert-type' => 'success'
         ]);
-}
 
+    }
 
     /**
      * Hapus program.
@@ -180,9 +179,13 @@ class ProgramController extends Controller
      */
     public function show(Program $program)
     {
-        $program->load(['category', 'media']);
+        // Load semua relasi yang dibutuhkan
+        $program->load(['category', 'media', 'uses']);
 
+        // Decode breakdown JSON
         $breakdown = $program->breakdown ? json_decode($program->breakdown, true) : [];
+
+        // Ambil media dan donasi terbaru
         $media = $program->media;
         $recentDonations = $program->donations()
             ->where('status', 'confirmed')
@@ -197,4 +200,6 @@ class ProgramController extends Controller
             'media'
         ));
     }
+
+
 }

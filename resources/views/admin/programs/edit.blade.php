@@ -41,11 +41,7 @@
                     </div>
 
                     {{-- Kategori --}}
-                    <div class="mb-4">
-                        {{-- Hidden input agar nilai tetap terkirim ke server --}}
-                        <input type="hidden" name="category_id" value="{{ old('category_id', $program->category_id) }}">
-                    </div>
-
+                    <input type="hidden" name="category_id" value="{{ old('category_id', $program->category_id) }}">
 
                     {{-- Ringkasan --}}
                     <div class="mb-4">
@@ -97,13 +93,14 @@
                     <hr class="my-6">
 
                     {{-- Breakdown Interaktif --}}
-                    <div class="mb-4">
+                    {{-- <div class="mb-4">
                         <label class="{{ $formLabelClass }}">Rincian Dana</label>
+
                         <div id="breakdown-container" class="space-y-3">
                             @php
                                 $old_names = old('breakdown_name', []);
                                 $old_amounts = old('breakdown_amount', []);
-                                
+
                                 if (empty($old_names) && !empty($program->breakdown)) {
                                     $program_breakdown = is_array($program->breakdown) ? $program->breakdown : json_decode($program->breakdown, true);
                                     if (is_array($program_breakdown)) {
@@ -115,13 +112,13 @@
 
                             @if(!empty($old_names))
                                 @foreach($old_names as $index => $name)
-                                    <div class="flex flex-col md:flex-row gap-2 items-start md:items-center">
+                                    <div class="flex flex-col md:flex-row gap-2 items-start md:items-center breakdown-item">
                                         <input type="text" name="breakdown_name[]" value="{{ $name }}" placeholder="Nama Kegiatan" class="{{ $formInputClass }} flex-1">
                                         <div class="flex items-center w-full md:w-auto gap-2">
                                             <input type="text" name="breakdown_amount[]" 
                                                 value="{{ number_format((float) ($old_amounts[$index] ?? 0), 0, ',', '.') }}" 
                                                 placeholder="Jumlah (Rp)" 
-                                                class="{{ $formInputClass }} md:w-40" 
+                                                class="{{ $formInputClass }} md:w-40 format-ribuan" 
                                                 oninput="formatInputAsNumber(this)" 
                                                 inputmode="numeric">
                                             <button type="button" class="remove-btn p-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
@@ -139,8 +136,7 @@
                         </button>
 
                         <input type="hidden" name="breakdown" id="breakdown-json">
-                    </div>
-
+                    </div> --}}
 
                     {{-- Status --}}
                     <div class="mb-4">
@@ -195,7 +191,6 @@
 
     @push('scripts')
     <script>
-        // Format angka ribuan
         function formatInputAsNumber(input) {
             let value = input.value.replace(/\D/g, '');
             input.value = value ? new Intl.NumberFormat('id-ID').format(Number(value)) : '';
@@ -206,71 +201,62 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            // Format otomatis untuk input angka
-            document.querySelectorAll('.format-ribuan').forEach(input => {
-                formatInputAsNumber(input);
-                input.addEventListener('input', () => formatInputAsNumber(input));
-            });
-
             const form = document.querySelector('form');
             const container = document.getElementById('breakdown-container');
             const addBtn = document.getElementById('add-breakdown');
             const hiddenInput = document.getElementById('breakdown-json');
-            const inputClass = "{{ $formInputClass }}";
 
-        function addRow(name = '', amount = '') {
-            const container = document.getElementById('breakdown-container');
-            const div = document.createElement('div');
-            div.classList.add('flex', 'flex-col', 'md:flex-row', 'gap-2', 'items-start', 'md:items-center');
-
-            div.innerHTML = `
-                <input type="text" name="breakdown_name[]" value="${name}" placeholder="Nama Kegiatan" class="w-full p-1.5 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50 flex-1">
-                <div class="flex items-center w-full md:w-auto gap-2">
-                    <input type="text" name="breakdown_amount[]" value="${amount}" placeholder="Jumlah (Rp)" class="w-full md:w-40 p-1.5 border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50" oninput="formatInputAsNumber(this)" inputmode="numeric">
-                    <button type="button" class="remove-btn p-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
-                        <i data-feather="trash-2" class="w-4 h-4"></i>
-                    </button>
-                </div>
-            `;
-            container.appendChild(div);
-
-            // Refresh ikon Feather
-            if (typeof feather !== 'undefined') feather.replace();
-
-            // Event hapus
-            div.querySelector('.remove-btn').addEventListener('click', () => div.remove());
-}
-
-
-            // Hapus baris yang sudah ada
-            container.querySelectorAll('.remove-btn').forEach(btn => {
-                btn.addEventListener('click', () => btn.closest('.flex').remove());
+            // Format awal semua input angka
+            document.querySelectorAll('.format-ribuan').forEach(input => {
+                input.addEventListener('input', () => formatInputAsNumber(input));
             });
 
-            addBtn.addEventListener('click', () => addRow());
+            // Tambah baris breakdown
+            // addBtn.addEventListener('click', () => {
+            //     const div = document.createElement('div');
+            //     div.className = 'flex flex-col md:flex-row gap-2 items-start md:items-center breakdown-item';
+            //     div.innerHTML = `
+            //         <input type="text" name="breakdown_name[]" placeholder="Nama Kegiatan" class="{{ $formInputClass }} flex-1">
+            //         <div class="flex items-center w-full md:w-auto gap-2">
+            //             <input type="text" name="breakdown_amount[]" placeholder="Jumlah (Rp)" class="{{ $formInputClass }} md:w-40 format-ribuan" oninput="formatInputAsNumber(this)" inputmode="numeric">
+            //             <button type="button" class="remove-btn p-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
+            //                 <i data-feather="trash-2" class="w-4 h-4"></i>
+            //             </button>
+            //         </div>
+            //     `;
+            //     container.appendChild(div);
+            //     feather.replace();
 
-            // Saat form disubmit
+            //     div.querySelector('.remove-btn').addEventListener('click', () => div.remove());
+            // });
+
+            // // Hapus item lama
+            // container.querySelectorAll('.remove-btn').forEach(btn => {
+            //     btn.addEventListener('click', () => btn.closest('.breakdown-item').remove());
+            // });
+
+            // Saat submit
             form.addEventListener('submit', function () {
-                // Unformat semua angka
+                // Hilangkan format titik pada semua angka utama
                 document.querySelectorAll('.format-ribuan').forEach(input => {
                     input.value = unformatNumber(input.value);
                 });
 
-                // Siapkan data breakdown
-                const names = form.querySelectorAll('input[name="breakdown_name[]"]');
-                const amounts = form.querySelectorAll('input[name="breakdown_amount[]"]');
-                const data = [];
+                // Ubah breakdown jadi JSON
+                // const names = form.querySelectorAll('input[name="breakdown_name[]"]');
+                // const amounts = form.querySelectorAll('input[name="breakdown_amount[]"]');
+                // const data = [];
 
-                for (let i = 0; i < names.length; i++) {
-                    if (names[i].value.trim() !== '') {
-                        data.push({
-                            item: names[i].value.trim(),
-                            amount: parseFloat(unformatNumber(amounts[i].value)) || 0
-                        });
-                    }
-                }
+                // for (let i = 0; i < names.length; i++) {
+                //     if (names[i].value.trim() !== '') {
+                //         data.push({
+                //             item: names[i].value.trim(),
+                //             amount: parseFloat(unformatNumber(amounts[i].value)) || 0
+                //         });
+                //     }
+                // }
 
-                hiddenInput.value = JSON.stringify(data);
+                // hiddenInput.value = JSON.stringify(data);
             });
         });
     </script>

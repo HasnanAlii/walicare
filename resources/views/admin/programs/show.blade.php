@@ -1,18 +1,11 @@
 <x-admin-layout>
-    {{-- 
-        PERUBAHAN: 
-        - Menggunakan max-w-full untuk header agar tombol bisa di kanan.
-        - Menambahkan Alpine.js 'tab' untuk sistem tab baru.
-    --}}
     <div class="py-6" x-data="mediaPage()">
 
-        {{-- Header --}}
         <div class="max-w-7xl mx-auto flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold text-green-900 truncate pr-4">
                 Detail: {{ $program->title }}
             </h2>
             
-            {{-- PERUBAHAN: Tombol Aksi dipindah ke header --}}
             <div class="flex-shrink-0 flex items-center gap-2">
                 <button @click="openAddModal()" 
                         class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium">
@@ -24,12 +17,10 @@
                    <i data-feather="edit-2" class="w-4 h-4"></i>
                    Edit
                 </a>
-                {{-- PERUBAHAN: Menggunakan SweetAlert untuk Hapus --}}
                 <form id="delete-form-{{ $program->id }}" action="{{ route('admin.programs.destroy', $program) }}" method="POST">
                     @csrf
                     @method('DELETE')
-                    <button type
-                    ="button" 
+                    <button type="button" 
                             @click.prevent="confirmDelete({{ $program->id }})"
                             class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-medium">
                         <i data-feather="trash-2" class="w-4 h-4"></i>
@@ -41,7 +32,6 @@
 
         <div class="max-w-7xl mx-auto">
             <div class="bg-white shadow-lg rounded-xl overflow-hidden grid md:grid-cols-3 gap-0">
-                
                 <div class="md:col-span-2 relative min-h-[300px] md:min-h-0">
                     @if($program->image)
                         <img src="{{ asset('storage/'.$program->image) }}" 
@@ -58,20 +48,16 @@
                     </div>
                 </div>
 
-                {{-- Panel Donasi & Info --}}
                 <div class="p-6 flex flex-col">
                     <h3 class="text-xl font-bold text-gray-800 mb-2">Ringkasan Program</h3>
                     <p class="text-sm text-gray-500 mb-4">
                         Oleh <span class="font-semibold text-green-700">{{ $program->organizer ?? 'Walicare' }}</span>
                     </p>
 
-                    {{-- Progress Bar --}}
                     @php
                         $collected = $program->collected_amount ?? 0;
                         $target = $program->target_amount;
                         $percent = ($target > 0) ? min(100, ($collected / $target) * 100) : 0;
-                        
-                        // Logika Waktu
                         $daysLeft = (int) now()->diffInDays($program->end_date, false);
                         if ($program->status === 'completed') {
                             $timeLeft = 'Telah Selesai';
@@ -111,7 +97,7 @@
                             <i data-feather="tag" class="w-4 h-4 mr-3 text-gray-500"></i>
                             Kategori: <span class="font-semibold text-gray-800 ml-1">{{ $program->category->name ?? '-' }}</span>
                         </div>
-                         <div class="flex items-center text-gray-700">
+                        <div class="flex items-center text-gray-700">
                             <i data-feather="info" class="w-4 h-4 mr-3 text-gray-500"></i>
                             Status: 
                             <span class="font-semibold text-gray-800 ml-1 capitalize">{{ $program->status ?? 'Aktif' }}</span>
@@ -124,7 +110,6 @@
                 </div>
             </div>
 
-            {{-- PERUBAHAN: Sistem Tab --}}
             <div class="mt-8">
                 <div class="border-b border-gray-200">
                     <nav class="flex -mb-px space-x-6" aria-label="Tabs">
@@ -178,7 +163,6 @@
                                                                 alt="{{ $item->caption }}" 
                                                                 class="max-w-3xl w-full md:w-auto rounded-lg shadow-sm object-contain">
                                                         </div>
-
                                                     @elseif($item->type === 'video' && $item->path)
                                                         <div class="flex justify-center items-center mb-3">
                                                             <video controls class="max-w-3xl w-full rounded-lg shadow-sm">
@@ -195,13 +179,24 @@
                                                     @else
                                                         <p class="text-center text-gray-700 mt-2">{!! nl2br(e($item->caption)) !!}</p>
                                                     @endif
-
+                                                    <form action="{{ route('admin.programsmedia.destroy', $item->id) }}" method="POST" 
+                                                          onsubmit="return confirm('Yakin ingin menghapus kabar ini?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" 
+                                                            class="inline-flex items-center px-3 py-1 text-sm text-red-600 font-semibold hover:text-red-800 hover:bg-red-50 rounded-lg transition">
+                                                            <i data-feather="trash-2" class="w-4 h-4 mr-1"></i> Hapus
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>
                                     </li>
                                     @endforeach
                                 </ul>
+                                <div class="mt-4 text-right">
+</div>
+
                             </div>
                         @else
                             <div class="text-center bg-white p-12 rounded-lg shadow border border-gray-200">
@@ -214,83 +209,197 @@
 
                     <div x-show="tab === 'rincian'" x-transition x-cloak>
                         <div class="bg-white p-8 rounded-lg shadow border border-gray-200">
-                            <h3 class="text-xl font-bold text-gray-800 mb-4">Rincian Alokasi Dana</h3>
-                            @if($program->breakdown)
-                                <ul class="list-disc list-inside space-y-2 text-gray-700">
-                                    @foreach(json_decode($program->breakdown, true) as $item)
-                                        <li class="flex justify-between">
-                                            <span>{{ $item['item'] ?? '-' }}</span>
-                                            <span class="font-semibold">Rp {{ number_format($item['amount'] ?? 0,0,',','.') }}</span>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @else
-                                <p class="text-gray-500">Belum ada rincian dana yang dimasukkan untuk program ini.</p>
-                            @endif
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-bold text-gray-800">Rincian Alokasi Dana</h3>
+                                <button @click="openUse = true" 
+                                    class="inline-flex items-center gap-2 px-3 py-1.5 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-medium transition">
+                                    <i data-feather="plus" class="w-4 h-4"></i>
+                                    Tambah Penggunaan Dana
+                                </button>
+                            </div>
+
+                            <div class="border-t pt-4">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-3">Penggunaan Dana</h3>
+
+                                @if($program->uses->count())
+                                    <div class="overflow-x-auto">
+                                        <table class="min-w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
+                                            <thead class="bg-gray-100 text-gray-700 font-medium">
+                                                <tr>
+                                                    <th class="px-4 py-2 text-left">Tanggal</th>
+                                                    <th class="px-4 py-2 text-left">Catatan</th>
+                                                    <th class="px-4 py-2 text-right">Jumlah (Rp)</th>
+                                                    <th class="px-4 py-2 text-center w-20">Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-gray-100">
+                                                @foreach($program->uses as $use)
+                                                    <tr>
+                                                        <td class="px-4 py-2 text-gray-700">
+                                                            {{ $use->tanggal ? \Carbon\Carbon::parse($use->tanggal)->format('d M Y') : '-' }}
+                                                        </td>
+                                                        <td class="px-4 py-2 text-gray-600">
+                                                            {{ $use->note ?? '-' }}
+                                                        </td>
+                                                        <td class="px-4 py-2 text-right font-semibold text-gray-800">
+                                                            Rp {{ number_format($use->amount, 0, ',', '.') }}
+                                                        </td>
+                                                        <td class="px-4 py-2 text-center">
+                                                          <form action="{{ route('admin.program_uses.destroy', $use->id) }}" 
+                                                            method="POST" 
+                                                            onsubmit="return confirm('Apakah Anda yakin ingin menghapus penggunaan dana ini?');" 
+                                                            class="inline-block">
+                                                            @csrf
+                                                            @method('DELETE')
+
+                                                            <button type="submit"
+                                                                class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-600 
+                                                                    bg-red-50 hover:bg-red-100 hover:text-red-800 rounded-md transition
+                                                                    focus:outline-none focus:ring-2 focus:ring-red-300">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" 
+                                                                    class="w-4 h-4 mr-1" 
+                                                                    fill="none" 
+                                                                    viewBox="0 0 24 24" 
+                                                                    stroke="currentColor" 
+                                                                    stroke-width="2">
+                                                                    <path stroke-linecap="round" 
+                                                                        stroke-linejoin="round" 
+                                                                        d="M6 18L18 6M6 6l12 12" />
+                                                                </svg>
+                                                                Hapus
+                                                            </button>
+                                                        </form>
+
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                                <tr class="bg-gray-50 font-semibold">
+                                                    <td colspan="2" class="px-4 py-2 text-right text-gray-700">Total Penggunaan</td>
+                                                    <td class="px-4 py-2 text-right text-green-700">
+                                                        Rp {{ number_format($program->uses->sum('amount'), 0, ',', '.') }}
+                                                    </td>
+                                                    <td></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @else
+                                    <p class="text-gray-500 text-sm">Belum ada data penggunaan dana untuk program ini.</p>
+                                @endif
+                            </div>
                         </div>
                     </div>
 
-                  <div x-show="tab === 'donatur'" 
-     x-transition 
-     x-cloak
-     class="bg-white shadow-lg rounded-xl p-6 md:p-8">
+                    <div x-show="tab === 'donatur'" 
+                        x-transition 
+                        x-cloak
+                        class="bg-white shadow-lg rounded-xl p-6 md:p-8">
 
-    <h2 class="text-2xl font-bold text-gray-900 mb-4 border-b border-gray-200 pb-3">
-        Donatur ({{ $recentDonations->count() }})
-    </h2>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4 border-b border-gray-200 pb-3">
+                            Donatur ({{ $recentDonations->count() }})
+                        </h2>
 
-    @if($recentDonations->count())
-        <ul class="space-y-4 max-h-96 overflow-y-auto pr-2">
-            @foreach($recentDonations as $donation)
-                <li class="flex items-center space-x-4 p-2 hover:bg-gray-50 rounded-lg transition">
-                    
-                    {{-- Foto profil --}}
-                    <div class="flex-shrink-0">
-                        @if($donation->user && $donation->user->profile_photo)
-                            <img src="{{ asset('storage/' . $donation->user->profile_photo) }}" 
-                                 alt="{{ $donation->user->name }}" 
-                                 class="h-10 w-10 rounded-full object-cover border border-gray-200 shadow-sm">
-                        @elseif($donation->user && method_exists($donation->user, 'profile_photo_url'))
-                            <img src="{{ $donation->user->profile_photo_url }}" 
-                                 alt="{{ $donation->user->name }}" 
-                                 class="h-10 w-10 rounded-full object-cover border border-gray-200 shadow-sm">
+                        @if($recentDonations->count())
+                            <ul class="space-y-4 max-h-96 overflow-y-auto pr-2">
+                                @foreach($recentDonations as $donation)
+                                    <li class="flex items-center space-x-4 p-2 hover:bg-gray-50 rounded-lg transition">
+                                        <div class="flex-shrink-0">
+                                            @if($donation->user && $donation->user->profile_photo)
+                                                <img src="{{ asset('storage/' . $donation->user->profile_photo) }}" 
+                                                    alt="{{ $donation->user->name }}" 
+                                                    class="h-10 w-10 rounded-full object-cover border border-gray-200 shadow-sm">
+                                            @elseif($donation->user && method_exists($donation->user, 'profile_photo_url'))
+                                                <img src="{{ $donation->user->profile_photo_url }}" 
+                                                    alt="{{ $donation->user->name }}" 
+                                                    class="h-10 w-10 rounded-full object-cover border border-gray-200 shadow-sm">
+                                            @else
+                                                <div class="bg-gray-100 rounded-full h-10 w-10 flex items-center justify-center">
+                                                    <i data-feather="user" class="w-5 h-5 text-gray-500"></i>
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <div class="flex-1 text-left">
+                                            <p class="font-semibold text-gray-800">
+                                                {{ $donation->is_anonymous ? 'Donatur Anonim' : $donation->donor_name }}
+                                            </p>
+                                            <p class="text-sm text-gray-500">
+                                                {{ $donation->created_at->diffForHumans() }}
+                                            </p>
+                                        </div>
+
+                                        <span class="text-lg font-bold text-green-600 whitespace-nowrap">
+                                            Rp {{ number_format($donation->amount, 0, ',', '.') }}
+                                        </span>
+                                    </li>
+                                @endforeach
+                            </ul>
                         @else
-                            <div class="bg-gray-100 rounded-full h-10 w-10 flex items-center justify-center">
-                                <i data-feather="user" class="w-5 h-5 text-gray-500"></i>
+                            <div class="text-center py-12">
+                                <i data-feather="users" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
+                                <h3 class="text-xl font-semibold text-gray-700">Belum Ada Donatur</h3>
+                                <p class="text-gray-500 mt-2">Jadilah donatur pertama untuk program ini!</p>
                             </div>
                         @endif
                     </div>
-
-                    {{-- Info donatur --}}
-                    <div class="flex-1 text-left">
-                        <p class="font-semibold text-gray-800">
-                            {{ $donation->is_anonymous ? 'Donatur Anonim' : $donation->donor_name }}
-                        </p>
-                        <p class="text-sm text-gray-500">
-                            {{ $donation->created_at->diffForHumans() }}
-                        </p>
-                    </div>
-
-                    {{-- Nominal --}}
-                    <span class="text-lg font-bold text-green-600 whitespace-nowrap">
-                        Rp {{ number_format($donation->amount, 0, ',', '.') }}
-                    </span>
-                </li>
-            @endforeach
-        </ul>
-    @else
-        <div class="text-center py-12">
-            <i data-feather="users" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
-            <h3 class="text-xl font-semibold text-gray-700">Belum Ada Donatur</h3>
-            <p class="text-gray-500 mt-2">Jadilah donatur pertama untuk program ini!</p>
-        </div>
-    @endif
-</div>
-
                 </div>
             </div>
         </div>
 
+        <div x-show="openUse" x-cloak
+             class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+             @keydown.escape.window="openUse = false">
+
+            <div class="bg-white rounded-lg w-full max-w-lg p-6 shadow-2xl" @click.away="openUse = false">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800" 
+                        x-text="useId ? 'Edit Penggunaan Dana' : 'Tambah Penggunaan Dana'"></h3>
+                    <button @click="openUse = false" class="text-gray-400 hover:text-gray-600">&times;</button>
+                </div>
+
+                <form 
+                    :action="useId 
+                        ? '/admin/programs/{{ $program->id }}/uses/' + useId 
+                        : '{{ route('admin.program_uses.store', $program) }}'"
+                    method="POST">
+                    
+                    @csrf
+                    <template x-if="useId">
+                        <input type="hidden" name="_method" value="PUT">
+                    </template>
+                    <input type="hidden" name="program_id" value="{{ $program->id }}">
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-1">Keterangan</label>
+                        <textarea name="note" rows="3" x-model="useNote"
+                            class="w-full border-gray-300 p-2 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500"
+                            placeholder="Masukan Keterangan."></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-1">Jumlah (Rp) *</label>
+                        <input type="number" name="amount" x-model="useAmount" required min="0"
+                            class="w-full border-gray-300 p-2 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500"
+                            placeholder="Masukan Jumlah">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-1">Tanggal</label>
+                        <input type="date" name="tanggal" x-model="useDate"
+                            class="w-full border-gray-300 p-2 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500">
+                    </div>
+
+                    <div class="flex justify-end gap-3 mt-6">
+                        <button type="button" @click="openUse = false"
+                                class="px-5 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">
+                            Batal
+                        </button>
+                        <button type="submit"
+                                class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
+                                x-text="useId ? 'Perbarui' : 'Simpan'">
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
         <div x-show="open" x-cloak
              class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4" 
@@ -310,7 +419,7 @@
                     </template>
                     <input type="hidden" name="program_id" value="{{ $program->id }}">
 
-                   <div class="mb-4">
+                    <div class="mb-4">
                         <label class="block text-sm font-medium mb-1">Jenis Media *</label>
                         <select name="type" x-model="type" class="w-full border-gray-300 p-2 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500" required>
                             <option value="">-- Pilih Jenis --</option>
@@ -358,63 +467,83 @@
 
                     <div class="flex justify-end gap-3 mt-6">
                         <button type="button" @click="open = false" class="px-5 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">Batal</button>
-                        <button type="submit" class="px-5 py-2 bg-green-600 text-white rounded-lg  hover:bg-green-700 transition font-medium" 
+                        <button type="submit" class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium" 
                                 x-text="mediaId ? 'Perbarui' : 'Tambahkan'"></button>
                     </div>
                 </form>
             </div>
         </div>
-
     </div>
 
     @push('scripts')
     <script>
-        function mediaPage() {
-            return {
-                tab: 'kabar', 
-                open: false,
-                mediaId: null,
-                type: '',
-                caption: '',
-                preview: null,
-
-                openAddModal() {
-                    this.open = true;
-                    this.mediaId = null;
-                    this.type = '';
-                    this.caption = '';
+     function mediaPage() {
+        return {
+            tab: 'kabar',
+            open: false,
+            openUse: false,
+            mediaId: null,
+            useId: null,
+            type: '',
+            caption: '',
+            preview: null,
+            useAmount: '',
+            useDate: '',
+            useNote: '',
+            openAddModal() {
+                this.open = true;
+                this.mediaId = null;
+                this.type = '';
+                this.caption = '';
+                this.preview = null;
+                const fileInput = document.querySelector('input[type="file"]');
+                if (fileInput) fileInput.value = '';
+            },
+            openUseModal(use = null) {
+                this.openUse = true;
+                if (use) {
+                    this.useId = use.id;
+                    this.useAmount = use.amount;
+                    this.useDate = use.tanggal;
+                    this.useNote = use.note;
+                } else {
+                    this.useId = null;
+                    this.useAmount = '';
+                    this.useDate = '';
+                    this.useNote = '';
+                }
+            },
+            previewFile(event) {
+                const file = event.target.files[0];
+                if (!file) {
                     this.preview = null;
-                    const fileInput = document.querySelector('input[type="file"]');
-                    if (fileInput) fileInput.value = '';
-                },
-
-                previewFile(event) {
-                    const file = event.target.files[0];
-                    if (!file) {
-                        this.preview = null;
-                        return;
-                    }
-                    this.preview = URL.createObjectURL(file);
+                    return;
                 }
+                this.preview = URL.createObjectURL(file);
+            },
+            closeAllModals() {
+                this.open = false;
+                this.openUse = false;
             }
-        }
+        };
+    }
 
-        function confirmDelete(programId) {
-            Swal.fire({
-                title: 'Apakah Anda yakin?',
-                text: "Program ini akan dihapus secara permanen!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33', // Merah
-                cancelButtonColor: '#10B981', // Hijau
-                confirmButtonText: 'Ya, hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('delete-form-' + programId).submit();
-                }
-            });
-        }
+    function confirmDelete(programId) {
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Program ini akan dihapus secara permanen!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#10B981',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('delete-form-' + programId).submit();
+            }
+        });
+    }
     </script>
     @endpush
 </x-admin-layout>

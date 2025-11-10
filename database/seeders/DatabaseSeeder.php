@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
         ProgramSeeder::class,   
         CategorySeeder::class,
         EventSeeder::class,
+        
     ]);
     }
 }

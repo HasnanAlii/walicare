@@ -27,7 +27,6 @@ class StoreProgramRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'target_amount' => ['required', 'numeric', 'min:0'],
             'collected_amount' => ['nullable', 'numeric', 'min:0'],
-            'breakdown' => ['nullable', 'array'],
             'status' => ['required', 'in:draft,active,completed,cancelled'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],

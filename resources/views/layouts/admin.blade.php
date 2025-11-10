@@ -84,9 +84,6 @@
             <a href="{{ route('admin.programs.index') }}" class="nav-item @if(request()->routeIs('admin.programs.*')) active @endif">
                 <i data-feather="grid"></i> Program
             </a>
-            <a href="{{ route('admin.beneficiaries.index') }}" class="nav-item @if(request()->routeIs('admin.beneficiaries.*')) active @endif">
-                <i data-feather="users"></i> Penerima Donasi
-            </a>
             <a href="{{ route('admin.events.index') }}" class="nav-item @if(request()->routeIs('admin.events.*')) active @endif">
                 <i data-feather="calendar"></i> Kegiatan
             </a>

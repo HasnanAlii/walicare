@@ -14,14 +14,14 @@ return new class extends Migration
         Schema::create('programs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('category_id')->nullable();
-            $table->unsignedBigInteger('created_by')->nullable(); // user id pembuat
+            $table->unsignedBigInteger('created_by')->nullable(); 
             $table->string('title');
             $table->string('slug')->unique();
             $table->string('summary')->nullable();
             $table->longText('description')->nullable();
             $table->decimal('target_amount', 15, 2)->default(0);
             $table->decimal('collected_amount', 15, 2)->default(0);
-            $table->json('breakdown')->nullable(); // breakdown penggunaan dana
+            // $table->json('breakdown')->nullable(); // breakdown penggunaan dana
             $table->enum('status', ['draft','active','completed','cancelled'])->default('draft');
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
