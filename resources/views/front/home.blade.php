@@ -1,31 +1,65 @@
 <x-guest-layout>
 
-    {{-- 1. HERO SECTION (TETAP) --}}
-    <div class="relative overflow-hidden" style="background: linear-gradient(135deg, #16a862, #28c76f);">
-        <div class="absolute inset-0 opacity-15" style="background-image: url('{{ asset('storage/hero-background.jpg') }}'); background-size: cover; background-position: center;"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-[#16a862] via-transparent to-transparent opacity-50"></div>
-        
-        <div class="relative max-w-7xl mx-auto px-6 lg:px-8 py-24 sm:py-32 text-center text-white z-10">
-            <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight drop-shadow-md">
-                Bantu Wujudkan Harapan Mereka
-            </h1>
-            <p class="mt-6 text-lg sm:text-xl max-w-2xl mx-auto drop-shadow-sm">
-                Salurkan donasi Anda secara aman, transparan, dan mudah melalui Wali Care untuk membantu mereka yang membutuhkan.
-            </p>
-            <div class="mt-10 flex items-center justify-center gap-x-6">
-                <a href="{{ route('programs.index') }}" 
-                   class="rounded-lg bg-white px-5 py-3 text-sm font-semibold text-[#16a862] shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#16a862] transition">
-                   Donasi Sekarang
-                </a>
-                <a href="#featured-programs" class="text-sm font-semibold leading-6 text-white hover:text-gray-200">
-                    Lihat Program <span aria-hidden="true">→</span>
-                </a>
-            </div>
-        </div>
+{{-- 1. HERO SECTION --}}
+<div class="relative overflow-hidden bg-gradient-to-br from-[#1a8f56] to-[#28c76f] min-h-[500px] flex items-center">
+    <div class="absolute inset-0 opacity-25 mix-blend-overlay">
+        <img src="{{ asset('storage/batik.jpg') }}" 
+             alt="Latar Kebaikan" 
+             class="w-full h-full object-cover select-none">
     </div>
 
-    
+    <div class="absolute -top-1 -left-1 md:ml-64 w-48 sm:w-64 md:w-80 lg:w-96 opacity-70  animate-pulse-slow-reverse">
+        <img src="{{ asset('storage/b1.png') }}" alt="Aksen Kebaikan" class="w-full h-auto select-none">
+    </div>
 
+    <div class="absolute -bottom-0 -right-1 md:mr-64 w-48 sm:w-64 md:w-80 lg:w-96 opacity-60  animate-pulse-slow">
+        <img src="{{ asset('storage/b2.png') }}" alt="Aksen Donasi" class="w-full h-auto select-none">
+    </div>
+
+    <style>
+        .text-shadow-md {
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .text-shadow-lg {
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Animasi lembut untuk aksen */
+        @keyframes pulse-slow {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        @keyframes pulse-slow-reverse {
+            0%, 100% { transform: scale(1.05); opacity: 0.8; }
+            50% { transform: scale(1); opacity: 0.6; }
+        }
+        .animate-pulse-slow {
+            animation: pulse-slow 8s ease-in-out infinite;
+        }
+        .animate-pulse-slow-reverse {
+            animation: pulse-slow-reverse 8s ease-in-out infinite;
+        }
+    </style>
+
+    <div class="relative max-w-7xl mx-auto px-6 lg:px-8 py-24 sm:py-32 text-center text-white z-10 w-full">
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-shadow-lg">
+            Bantu Wujudkan Harapan Mereka
+        </h1>
+        <p class="mt-6 text-lg sm:text-xl max-w-2xl mx-auto text-shadow-md">
+            Salurkan donasi Anda secara aman, transparan, dan mudah melalui Wali Care untuk membantu mereka yang membutuhkan.
+        </p>
+        <div class="mt-10 flex items-center justify-center gap-x-6">
+            <a href="{{ route('programs.index') }}" 
+               class="rounded-lg bg-white px-5 py-3 text-sm font-semibold text-[#16a862] shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#16a862] transition">
+               Donasi Sekarang
+            </a>
+            <a href="#featured-programs" class="text-sm font-semibold leading-6 text-white hover:text-gray-200 text-shadow-lg">
+                Lihat Program <span aria-hidden="true">→</span>
+            </a>
+        </div>
+    </div>
+</div>
+    
     {{-- 2. STATS COUNTER (TETAP) --}}
     <div class="bg-white py-12 sm:py-16">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">

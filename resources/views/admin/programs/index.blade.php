@@ -4,13 +4,26 @@
         {{-- Header --}}
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold text-green-900">Daftar Program</h2>
-            <a href="{{ route('admin.programs.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition shadow-sm text-sm font-medium">
-                <i data-feather="plus" class="w-4 h-4"></i>
-                Tambah Program
-            </a>
+            <div class="flex gap-2">
+                <a href="{{ route('admin.program_uses.export.pdf') }}"  target="_blank"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition shadow-sm text-sm font-medium">
+                    <i data-feather="file-text" class="w-4 h-4"></i>
+                    Cetak Laporan Pemakaian Dana Bulanan PDF
+                </a>
+                {{-- <a href="{{ route('admin.program_uses.export.excel') }}"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition shadow-sm text-sm font-medium">
+                    <i data-feather="file-spreadsheet" class="w-4 h-4"></i>
+                    Export Excel
+                </a> --}}
+                <a href="{{ route('admin.programs.create') }}" 
+                class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-sm text-sm font-medium">
+                    <i data-feather="plus" class="w-4 h-4"></i>
+                    Tambah Program
+                </a>
+            </div>
         </div>
 
-        {{-- Grid Daftar Program --}}
+
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
             @php
@@ -76,9 +89,27 @@
                                 <span>Rp {{ number_format($collected, 0, ',', '.') }}</span>
                                 <span class="text-green-800 font-semibold">{{ number_format($percentage, 0) }}%</span>
                             </div>
-                            <div class="text-xs text-gray-500 mt-0.5">
-                                Target: Rp {{ number_format($target, 0, ',', '.') }}
+                           <div class="text-xs text-gray-500 mt-0.5">
+                                @if ($target == 0)
+                                    <div class="flex items-center gap-1 text-green-600 leading-none">
+                                        <span class="font-medium">Target:</span>
+                                        {{-- Ikon tanpa batas (infinity) --}}
+                                        <svg xmlns="http://www.w3.org/2000/svg" 
+                                            fill="none" viewBox="0 0 24 24" 
+                                            stroke-width="2" stroke="currentColor" 
+                                            class="w-4 h-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" 
+                                                d="M18.364 5.636a9 9 0 010 12.728M5.636 5.636a9 9 0 000 12.728m0 0L18.364 5.636m0 12.728L5.636 5.636" />
+                                        </svg>
+                                        <span>Tanpa Batas</span>
+                                    </div>
+                                @else
+                                    Target: Rp {{ number_format($target, 0, ',', '.') }}
+                                @endif
                             </div>
+
+
+
                         </div>
 
                         {{-- Info Tanggal & Lokasi --}}

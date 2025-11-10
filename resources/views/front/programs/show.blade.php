@@ -138,27 +138,58 @@
                        <div class="sticky top-56 space-y-6">
                         
                         {{-- Progres Donasi --}}
-                        <div class="bg-white shadow-lg rounded-xl p-6">
-                            <h3 class="text-xl font-bold text-gray-900">Progres Donasi</h3>
-                            
-                            <div class="mt-4">
-                                <div class="w-full bg-gray-200 rounded-full h-3">
-                                    <div class="bg-green-500 h-3 rounded-full" style="width: {{ $progress }}%"></div>
-                                </div>
-                                <div class="flex justify-between mt-2 text-sm">
-                                    <span class="font-medium text-gray-700">
-                                        Terkumpul:
-                                        <span class="text-green-700 font-bold">
-                                            Rp {{ number_format($totalDonations, 0, ',', '.') }}
+                            @php
+                                $target = $program->target_amount ?? 0;
+                                $totalDonations = $totalDonations ?? 0;
+
+                                $progress = $target > 0 ? ($totalDonations / $target) * 100 : 0;
+                                $progress = min($progress, 100);
+                            @endphp
+
+                            <div class="bg-white shadow-lg rounded-xl p-6">
+                                <h3 class="text-xl font-bold text-gray-900">Progres Donasi</h3>
+                                
+                                <div class="mt-4">
+                                    <!-- Progress Bar -->
+                                    <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                                        <div class="bg-green-500 h-3 rounded-full transition-all duration-500" 
+                                            style="width: {{ $progress }}%;">
+                                        </div>
+                                    </div>
+
+                                    <!-- Info Donasi -->
+                                    <div class="flex justify-between mt-2 text-lg">
+                                        <span class="font-medium text-gray-700 py-2">
+                                            Terkumpul:
+                                            <span class="text-green-700 font-bold text-xl">
+                                                Rp {{ number_format($totalDonations, 0, ',', '.') }}
+                                            </span>
                                         </span>
-                                    </span>
-                                    <span class="font-bold text-gray-800">{{ $progress }}%</span>
+                                        <span class="font-bold text-gray-800">
+                                            {{ number_format($progress, 0) }}%
+                                        </span>
+                                    </div>
+                                    <div class="mt-1 text-sm text-gray-500 flex items-center gap-1 leading-none">
+                                    <span>Target:</span>
+
+                                    @if ($program->target_amount == 0)
+                                        {{-- Ikon tanpa batas (infinity) --}}
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            fill="none" viewBox="0 0 24 24"
+                                            stroke-width="2" stroke="currentColor"
+                                            class="w-4 h-4 text-green-600">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M18.364 5.636a9 9 0 010 12.728M5.636 5.636a9 9 0 000 12.728m0 0L18.364 5.636m0 12.728L5.636 5.636" />
+                                        </svg>
+                                        <span class="text-green-600">Tanpa Batas</span>
+                                    @else
+                                        <span>Rp {{ number_format($program->target_amount, 0, ',', '.') }}</span>
+                                    @endif
                                 </div>
-                                <div class="mt-1 text-sm text-gray-500">
-                                    Target: Rp {{ number_format($program->target_amount, 0, ',', '.') }}
+
                                 </div>
                             </div>
-                        </div>
+
 
                         {{-- Form Donasi --}}
                         <div class="bg-white shadow-lg rounded-xl p-6 mt-6">
@@ -173,10 +204,10 @@
                                     </ul>
                                 </div>
                             @endif
-
                             <form action="{{ route('donations.store', $program->slug) }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="program_id" value="{{ $program->id }}">
+
                                 <div class="space-y-4">
                                     <div>
                                         <label for="amount" class="block text-sm font-medium text-gray-700">Jumlah Donasi (Rp)</label>
@@ -191,37 +222,80 @@
                                     <div>
                                         <label for="donor_name" class="block text-sm font-medium text-gray-700">Nama Anda</label>
                                         <input type="text" name="donor_name" id="donor_name" 
-                                               value="{{ auth()->check() ? auth()->user()->name : old('donor_name') }}"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500" 
-                                               placeholder="Nama lengkap Anda" required>
+                                            value="{{ auth()->check() ? auth()->user()->name : old('donor_name') }}"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500" 
+                                            placeholder="Nama lengkap Anda" required>
                                     </div>
+
                                     <div>
                                         <label for="donor_email" class="block text-sm font-medium text-gray-700">Email Anda</label>
                                         <input type="email" name="donor_email" id="donor_email" 
-                                               value="{{ auth()->check() ? auth()->user()->email : old('donor_email') }}"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500" 
-                                               placeholder="Email untuk notifikasi" required>
+                                            value="{{ auth()->check() ? auth()->user()->email : old('donor_email') }}"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500" 
+                                            placeholder="Email untuk notifikasi" required>
                                     </div>
+
+                                    {{-- ✅ Checkbox Donasi Anonim --}}
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="is_anonymous" name="is_anonymous" value="1" 
+                                            class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                                        <label for="is_anonymous" class="ml-2 block text-sm text-gray-700">
+                                            Donasi sebagai Anonim
+                                    </div>
+
                                     <div>
                                         <label for="method" class="block text-sm font-medium text-gray-700">Metode Pembayaran</label>
                                         <select name="method" id="method" 
                                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500" required>
-                                            <option value="">Pilih Pembayaran</option>
-                                            <option value="bank_transfer">Bank Transfer (BCA/Mandiri/dll)</option>
+                                            <option value="bank_transfer">Bank Transfer (BCA)</option>
                                         </select>
                                     </div>
+
                                     <div>
                                         <label for="note" class="block text-sm font-medium text-gray-700">Pesan (Opsional)</label>
                                         <textarea name="note" id="note" rows="3" 
-                                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-                                                  placeholder="Tulis doa atau dukungan Anda di sini..."></textarea>
+                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                                                placeholder="Tulis doa atau dukungan Anda di sini..."></textarea>
                                     </div>
+
                                     <button type="submit" 
                                             class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">
                                         LANJUTKAN PEMBAYARAN
                                     </button>
                                 </div>
                             </form>
+
+                            {{-- ✅ SCRIPT OTOMATIS --}}
+                            <script>
+                            document.addEventListener("DOMContentLoaded", () => {
+                                const checkbox = document.getElementById('is_anonymous');
+                                const nameInput = document.getElementById('donor_name');
+                                const emailInput = document.getElementById('donor_email');
+
+                                // Simpan nilai asli untuk dikembalikan nanti
+                                const originalName = nameInput.value;
+                                const originalEmail = emailInput.value;
+
+                                checkbox.addEventListener('change', function() {
+                                    if (this.checked) {
+                                        nameInput.value = 'Anonim';
+                                        emailInput.value = 'anonim@example.com';
+                                        nameInput.setAttribute('readonly', true);
+                                        emailInput.setAttribute('readonly', true);
+                                        nameInput.classList.add('bg-gray-100');
+                                        emailInput.classList.add('bg-gray-100');
+                                    } else {
+                                        nameInput.value = originalName;
+                                        emailInput.value = originalEmail;
+                                        nameInput.removeAttribute('readonly');
+                                        emailInput.removeAttribute('readonly');
+                                        nameInput.classList.remove('bg-gray-100');
+                                        emailInput.classList.remove('bg-gray-100');
+                                    }
+                                });
+                            });
+                            </script>
+
                         </div>
                     </div>
                 </div>

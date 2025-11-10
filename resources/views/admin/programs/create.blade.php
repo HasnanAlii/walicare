@@ -68,7 +68,7 @@
                                 type="text" 
                                 name="target_amount" 
                                 class="{{ $formInputClass }} format-ribuan" 
-                                required 
+                                placeholder="Kosongkan untuk target tanpa batas"
                                 inputmode="numeric"
                             >
                         </div>

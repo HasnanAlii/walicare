@@ -73,12 +73,27 @@
 
                     <div class="mb-3">
                         <p class="text-2xl font-bold text-green-700">
-                            Rp {{ number_format($collected,0,',','.') }}
+                            Rp {{ number_format($collected, 0, ',', '.') }}
                         </p>
-                        <p class="text-sm text-gray-500">
-                            Terkumpul dari target Rp {{ number_format($target,0,',','.') }}
+                        <p class="text-sm text-gray-500 flex items-center gap-1 leading-none">
+                            <span>Terkumpul dari target</span>
+
+                            @if ($target == 0)
+                                {{-- Ikon tanpa batas (infinity) --}}
+                                <svg xmlns="http://www.w3.org/2000/svg" 
+                                    fill="none" viewBox="0 0 24 24" 
+                                    stroke-width="2" stroke="currentColor" 
+                                    class="w-4 h-4 text-green-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round" 
+                                        d="M18.364 5.636a9 9 0 010 12.728M5.636 5.636a9 9 0 000 12.728m0 0L18.364 5.636m0 12.728L5.636 5.636" />
+                                </svg>
+                                <span class="text-green-600">Tanpa Batas</span>
+                            @else
+                                <span>Rp {{ number_format($target, 0, ',', '.') }}</span>
+                            @endif
                         </p>
                     </div>
+
 
                     <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
                         <div class="bg-green-600 h-3 rounded-full transition-all duration-500" style="width: {{ $percent }}%"></div>

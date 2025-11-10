@@ -34,6 +34,10 @@ class Program extends Model
         'is_featured' => 'boolean',
     ];
 
+    protected $attributes = [
+    'target_amount' => null,
+    ];
+
     /**
      * Route model binding menggunakan slug.
      */
@@ -59,14 +63,6 @@ class Program extends Model
     }
 
     /**
-     * Relasi ke milestone (tahapan program).
-     */
-    public function milestones()
-    {
-        return $this->hasMany(Milestone::class);
-    }
-
-    /**
      * Relasi ke donasi.
      */
     public function donations()
@@ -74,14 +70,7 @@ class Program extends Model
         return $this->hasMany(Donation::class);
     }
 
-    /**
-     * Relasi ke penerima manfaat.
-     */
-    public function beneficiaries()
-    {
-        return $this->hasMany(Beneficiary::class);
-    }
-
+    
     /**
      * Relasi ke pengguna dana (program_uses).
      */

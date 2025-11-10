@@ -32,48 +32,61 @@ class ProgramController extends Controller
         return view('admin.programs.create', compact('categories'));
     }
 
-    /**
-     * Simpan data program baru.
-     */
+
     public function store(Request $request)
     {
-        // Validasi manual
         $validated = $request->validate([
             'category_id' => ['nullable', 'exists:program_categories,id'],
             'title' => ['required', 'string', 'max:255', 'unique:programs,title'],
             'slug' => ['nullable', 'string', 'max:255', 'unique:programs,slug'],
             'summary' => ['nullable', 'string', 'max:500'],
             'description' => ['nullable', 'string'],
-            'target_amount' => ['required'],
-            'collected_amount' => ['nullable'],
+            'target_amount' => ['nullable', 'string'],
+            'collected_amount' => ['nullable', 'string'],
             'breakdown' => ['nullable', 'array'],
             'status' => ['required', 'in:draft,active,completed,cancelled'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
             'location' => ['nullable', 'string', 'max:255'],
             'is_featured' => ['nullable', 'boolean'],
-            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:15120'], 
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:15120'],
         ]);
 
-        // Bersihkan angka dari titik (misalnya "10.000" → "10000")
-        $validated['target_amount'] = str_replace('.', '', $validated['target_amount']);
-        $validated['collected_amount'] = str_replace('.', '', $validated['collected_amount'] ?? 0);
+        $rawTarget = $request->input('target_amount', null);
+        $rawCollected = $request->input('collected_amount', null);
 
-        // Tambahkan ID pembuat
-        $validated['created_by'] = Auth::id();
+        if ($rawTarget === null || trim($rawTarget) === '') {
+            $targetAmount = null;
+        } else {
+            $targetAmount = str_replace('.', '', $rawTarget);
+            $targetAmount = str_replace(',', '.', $targetAmount);
+            $targetAmount = is_numeric($targetAmount) ? $targetAmount : null;
+        }
 
-        // Upload gambar jika ada
+        if ($rawCollected === null || trim($rawCollected) === '') {
+            $collectedAmount = 0;
+        } else {
+            $collectedAmount = str_replace('.', '', $rawCollected);
+            $collectedAmount = str_replace(',', '.', $collectedAmount);
+            $collectedAmount = is_numeric($collectedAmount) ? $collectedAmount : 0;
+        }
+
+        $data = $validated;
+
+        $data['target_amount'] = $targetAmount;       
+        $data['collected_amount'] = $collectedAmount;  
+        $data['created_by'] = Auth::id();
+
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('programs', 'public');
+            $data['image'] = $request->file('image')->store('programs', 'public');
         }
 
         // Slug otomatis
-        if (empty($validated['slug'])) {
-            $validated['slug'] = Str::slug($validated['title']);
-        }
+        if (empty($data['slug'])) {
+            $data['slug'] = Str::slug($data['title']);
+        };
 
-        // Simpan data program
-        Program::create($validated);
+        Program::create($data);
 
         return redirect()
             ->route('admin.programs.index')
@@ -82,6 +95,7 @@ class ProgramController extends Controller
                 'alert-type' => 'success'
             ]);
     }
+
 
     /**
      * Form edit program.
@@ -95,55 +109,73 @@ class ProgramController extends Controller
     /**
      * Perbarui data program.
      */
-public function update(Request $request, Program $program)
-{
-    // 🔍 Validasi input
-    $validated = $request->validate([
-        'category_id' => ['nullable', 'exists:program_categories,id'],
-        'title' => ['required', 'string', 'max:255', 'unique:programs,title,' . $program->id],
-        'slug' => ['nullable', 'string', 'max:255', 'unique:programs,slug,' . $program->id],
-        'summary' => ['nullable', 'string', 'max:500'],
-        'description' => ['nullable', 'string'],
-        'target_amount' => ['required'],
-        'collected_amount' => ['nullable'],
-        'status' => ['required', 'in:draft,active,completed,cancelled'],
-        'start_date' => ['nullable', 'date'],
-        'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
-        'location' => ['nullable', 'string', 'max:255'],
-        'is_featured' => ['nullable', 'boolean'],
-        'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:15120'],
-    ]);
-
-    // 🔢 Bersihkan angka dari format ribuan (contoh: "10.000" → "10000")
-    $validated['target_amount'] = (int) str_replace('.', '', $validated['target_amount']);
-    $validated['collected_amount'] = (int) str_replace('.', '', $validated['collected_amount'] ?? 0);
-
-   
-
-    // 🖼️ Upload gambar baru (hapus lama jika ada)
-    if ($request->hasFile('image')) {
-        if ($program->image && Storage::disk('public')->exists($program->image)) {
-            Storage::disk('public')->delete($program->image);
-        }
-        $validated['image'] = $request->file('image')->store('programs', 'public');
-    }
-
-    // 🧩 Buat slug otomatis jika kosong
-    if (empty($validated['slug'])) {
-        $validated['slug'] = Str::slug($validated['title']);
-    }
-
-    // 💾 Simpan perubahan ke database
-    $program->update($validated);
-
-    return redirect()
-        ->route('admin.programs.index')
-        ->with([
-            'message' => 'Program berhasil diperbarui!',
-            'alert-type' => 'success'
+    public function update(Request $request, Program $program)
+    {
+        $validated = $request->validate([
+            'category_id' => ['nullable', 'exists:program_categories,id'],
+            'title' => ['required', 'string', 'max:255', 'unique:programs,title,' . $program->id],
+            'slug' => ['nullable', 'string', 'max:255', 'unique:programs,slug,' . $program->id],
+            'summary' => ['nullable', 'string', 'max:500'],
+            'description' => ['nullable', 'string'],
+            'target_amount' => ['nullable', 'string'],
+            'collected_amount' => ['nullable', 'string'],
+            'breakdown' => ['nullable', 'array'],
+            'status' => ['required', 'in:draft,active,completed,cancelled'],
+            'start_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'is_featured' => ['nullable', 'boolean'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:15120'],
         ]);
 
+        // 🔢 Bersihkan angka target & collected seperti pada store()
+        $rawTarget = $request->input('target_amount', null);
+        $rawCollected = $request->input('collected_amount', null);
+
+        if ($rawTarget === null || trim($rawTarget) === '') {
+            $targetAmount = null;
+        } else {
+            $targetAmount = str_replace('.', '', $rawTarget);
+            $targetAmount = str_replace(',', '.', $targetAmount);
+            $targetAmount = is_numeric($targetAmount) ? $targetAmount : null;
+        }
+
+        if ($rawCollected === null || trim($rawCollected) === '') {
+            $collectedAmount = 0;
+        } else {
+            $collectedAmount = str_replace('.', '', $rawCollected);
+            $collectedAmount = str_replace(',', '.', $collectedAmount);
+            $collectedAmount = is_numeric($collectedAmount) ? $collectedAmount : 0;
+        }
+
+        $data = $validated;
+        $data['target_amount'] = $targetAmount;
+        $data['collected_amount'] = $collectedAmount;
+
+        // 🖼️ Jika ada upload gambar baru → hapus lama, simpan baru
+        if ($request->hasFile('image')) {
+            if ($program->image && Storage::disk('public')->exists($program->image)) {
+                Storage::disk('public')->delete($program->image);
+            }
+            $data['image'] = $request->file('image')->store('programs', 'public');
+        }
+
+        // 🧩 Slug otomatis jika kosong
+        if (empty($data['slug'])) {
+            $data['slug'] = Str::slug($data['title']);
+        }
+
+        // 💾 Update ke database
+        $program->update($data);
+
+        return redirect()
+            ->route('admin.programs.index')
+            ->with([
+                'message' => 'Program berhasil diperbarui!',
+                'alert-type' => 'success'
+            ]);
     }
+
 
     /**
      * Hapus program.

@@ -54,8 +54,10 @@
                         @php
                             $target = $program->target_amount ?? 0;
                             $collected = $program->collected_amount ?? 0;
-                            $percentage = ($target > 0) ? min(100, ($collected / $target) * 100) : 0;
+                            $percentage = $target > 0 ? (($collected / $target) * 100) : 0;
+                            $percentage = min($percentage, 100);
                         @endphp
+
 
                         {{-- Ini adalah Kartu Program yang baru (sama seperti di Landing Page) --}}
                         <div class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col transition-transform duration-300 hover:scale-[1.03]">
@@ -73,13 +75,27 @@
                                     <div class="w-full bg-gray-200 rounded-full h-2.5">
                                         <div class="bg-green-600 h-2.5 rounded-full" style="width: {{ $percentage }}%"></div>
                                     </div>
-                                    <div class="flex justify-between mt-2 text-sm">
-                                        <span class="font-medium text-gray-700">Terkumpul:
-                                            <span class="text-green-700 font-bold">Rp {{ number_format($collected, 0, ',', '.') }}</span>
-                                        </span>
-                                        <span class="font-medium text-gray-500">Target:
+                                    <div class=" mt-2 text-md">
+                                        <span class="font-medium text-gray-500 flex items-center gap-1 leading-none py-1">
+                                        <span>Target:</span>
+                                        @if ($target == 0)
+                                            {{-- Ikon tanpa batas (infinity) --}}
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                fill="none" viewBox="0 0 24 24"
+                                                stroke-width="2" stroke="currentColor"
+                                                class="w-4 h-4 text-green-600 ">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M18.364 5.636a9 9 0 010 12.728M5.636 5.636a9 9 0 000 12.728m0 0L18.364 5.636m0 12.728L5.636 5.636" />
+                                            </svg>
+                                            <span class="text-green-600">Tanpa Batas</span>
+                                        @else
                                             <span>Rp {{ number_format($target, 0, ',', '.') }}</span>
-                                        </span>
+                                        @endif
+                                    </span>
+                                    <span class="font-medium text-gray-700 mt-3">Terkumpul:
+                                            <span class="text-green-700 font-bold text-lg">Rp {{ number_format($collected, 0, ',', '.') }}</span>
+                                    </span>
+
                                     </div>
                                 </div>
 

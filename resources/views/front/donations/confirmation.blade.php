@@ -35,7 +35,7 @@
                             <span class="font-bold text-gray-900">{{ $paymentInfo['bank'] }}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-500">Nomor Rekening/HP</span>
+                            <span class="text-gray-500">Nomor Rekening</span>
                             <span class="font-bold text-gray-900">{{ $paymentInfo['number'] }}</span>
                         </div>
                         <div class="flex justify-between">

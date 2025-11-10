@@ -6,18 +6,16 @@ use App\Http\Controllers\Front\HomeController;
 use App\Http\Controllers\Front\ProgramController;
 use App\Http\Controllers\Front\EventController as FrontEventController;
 use App\Http\Controllers\Front\DonationController;
-use App\Http\Controllers\Donor\DashboardController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ProgramController as AdminProgramController;
 use App\Http\Controllers\Admin\ProgramMediaController as AdminProgramMediaController;
 use App\Http\Controllers\Admin\DonationController as AdminDonationController;
-use App\Http\Controllers\Admin\BeneficiaryController as AdminBeneficiaryController;
-use App\Http\Controllers\Admin\MilestoneController as AdminMilestoneController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\EventCategoryController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\MitraController;
 use App\Http\Controllers\Admin\ProgramUseController;
+use App\Http\Controllers\Admin\ProgramUseExportController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\ProfileController;
@@ -37,6 +35,12 @@ Route::get('/sejarah', [HomeController::class, 'sejarah'])->name('sejarah');
 Route::get('/tentang-kami', [HomeController::class, 'tentangKami'])->name('tentang');
 Route::get('/kontak', [HomeController::class, 'kontak'])->name('kontak');
 
+
+Route::prefix('donor')->group(function () {
+        Route::post('/donations/{program:slug}', [DonationController::class, 'store'])->name('donations.store');
+        Route::get('/donation/confirmation/{donation}', [DonationController::class, 'confirmation'])->name('donations.confirmation');
+    });
+
 // =======================
 // 🧍‍♂️ AUTH & PROFILE
 // =======================
@@ -52,14 +56,11 @@ Route::middleware(['auth'])->group(function () {
 
     // 💝 Donor Panel
     // Route::prefix('donor')->group(function () {
-    //     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    //     Route::get('/donations', [DashboardController::class, 'donations'])->name('donations');
     //     Route::post('/donations/{program:slug}', [DonationController::class, 'store'])->name('donations.store');
     //     Route::get('/donation/confirmation/{donation}', [DonationController::class, 'confirmation'])->name('donations.confirmation');
     // });
 
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-        // Route::get('/programs/{program:slug}', [ProgramController::class, 'show'])->name('programs.show');
 
 });
 
@@ -75,7 +76,9 @@ Route::middleware(['auth', 'role:Superadmin'])->prefix('admin')->name('admin.')-
 
         Route::resource('mitras', MitraController::class);
 
-        Route::resource('program_uses', ProgramUseController::class);     
+        Route::resource('program_uses', ProgramUseController::class);
+        Route::get('program-uses/export/pdf', [ProgramUseExportController::class, 'exportPdf'])->name('program_uses.export.pdf');
+        Route::get('program-uses/export/excel', [ProgramUseExportController::class, 'exportExcel'])->name('program_uses.export.excel');     
       
         Route::resource('programs', AdminProgramController::class)->middleware('permission:manage programs');
 
@@ -83,10 +86,8 @@ Route::middleware(['auth', 'role:Superadmin'])->prefix('admin')->name('admin.')-
 
         Route::resource('programsmedia', AdminProgramMediaController::class)->middleware('permission:manage programs');
 
-        Route::resource('milestones', AdminMilestoneController::class)->middleware('permission:manage programs');
 
         Route::resource('donations', AdminDonationController::class)->only(['index', 'show', 'update', 'destroy'])->middleware('permission:verify donations');
-        Route::resource('beneficiaries', AdminBeneficiaryController::class)->middleware('permission:manage programs');
     });
 
 require __DIR__ . '/auth.php';

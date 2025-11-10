@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->string('summary')->nullable();
             $table->longText('description')->nullable();
-            $table->decimal('target_amount', 15, 2)->default(0);
+            $table->decimal('target_amount', 15, 2)->nullable();
             $table->decimal('collected_amount', 15, 2)->default(0);
             // $table->json('breakdown')->nullable(); // breakdown penggunaan dana
             $table->enum('status', ['draft','active','completed','cancelled'])->default('draft');

@@ -87,9 +87,9 @@ public function store(Request $request, Program $program)
     $program->increment('collected_amount', $uniqueAmount);
 
     // ✅ (Opsional) Update status program jika target tercapai
-    if ($program->collected_amount >= $program->target_amount) {
-        $program->update(['status' => 'completed']);
-    }
+    // if ($program->collected_amount >= $program->target_amount) {
+    //     $program->update(['status' => 'completed']);
+    // }
 
     // ✅ Redirect ke halaman konfirmasi donasi
     return redirect()
@@ -107,20 +107,11 @@ public function store(Request $request, Program $program)
         // DISESUAIKAN: Key array disamakan dengan value 'method' yang baru
         $paymentDetails = [
             'bank_transfer' => [
-                'bank' => 'Bank Transfer (BCA/Mandiri)',
+                'bank' => 'Bank Transfer (BCA)',
                 'name' => 'Yayasan Wali Care',
-                'number' => '123-456-7890 (BCA) / 098-765-4321 (Mandiri)',
+                'number' => '123-456-7890 (BCA) ',
             ],
-            'ewallet' => [
-                'bank' => 'E-Wallet (GoPay/OVO)',
-                'name' => 'Wali Care',
-                'number' => '0812-3456-7890',
-            ],
-             'va' => [
-                'bank' => 'Virtual Account',
-                'name' => 'Selesaikan Pembayaran di Aplikasi Bank',
-                'number' => '0812-3456-7890',
-            ],
+           
         ];
 
         // DISESUAIKAN: Menggunakan $donation->method

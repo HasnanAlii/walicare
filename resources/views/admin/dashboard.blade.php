@@ -87,9 +87,24 @@
                                          class="w-16 h-16 object-cover rounded-lg">
                                     <div>
                                         <p class="font-semibold text-green-700">{{ $program->title }}</p>
-                                        <p class="text-sm text-gray-500">
-                                            Target: Rp {{ number_format($program->target_amount, 0, ',', '.') }}
-                                        </p>
+                                       <p class="text-sm text-gray-500 flex items-center gap-1 leading-none">
+    <span>Target:</span>
+
+    @if ($program->target_amount == 0)
+        {{-- Ikon tanpa batas (infinity) --}}
+        <svg xmlns="http://www.w3.org/2000/svg" 
+            fill="none" viewBox="0 0 24 24" 
+            stroke-width="2" stroke="currentColor" 
+            class="w-4 h-4 text-green-600">
+            <path stroke-linecap="round" stroke-linejoin="round" 
+                d="M18.364 5.636a9 9 0 010 12.728M5.636 5.636a9 9 0 000 12.728m0 0L18.364 5.636m0 12.728L5.636 5.636" />
+        </svg>
+        <span class="text-green-600">Tanpa Batas</span>
+    @else
+        <span>Rp {{ number_format($program->target_amount, 0, ',', '.') }}</span>
+    @endif
+</p>
+
                                     </div>
                                 </div>
                                 <a href="{{ route('admin.programs.show', $program->slug) }}" 
@@ -129,7 +144,7 @@
                             <i data-feather="layers" class="w-5 h-5"></i>
                             Kelola Kategori
                         </a>
-                        <a href="#" 
+                        <a href="{{ route('admin.program_uses.export.pdf') }}"  target="_blank"
                            class="flex items-center gap-3 p-4 bg-yellow-50 text-yellow-700 rounded-lg hover:bg-yellow-100 transition font-medium">
                             <i data-feather="bar-chart-2" class="w-5 h-5"></i>
                             Laporan Donasi
