@@ -14,14 +14,15 @@ return new class extends Migration
         Schema::create('donations', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('program_id')->nullable();
-            $table->unsignedBigInteger('user_id')->nullable(); // jika donor terdaftar
+            $table->unsignedBigInteger('user_id')->nullable(); 
             $table->string('donor_name')->nullable();
             $table->string('donor_email')->nullable();
             $table->decimal('amount', 15, 2);
-            $table->enum('method', ['bank_transfer','ewallet','va','manual'])->default('manual');
+            $table->enum('method', ['bank_transfer','manual'])->default('bank_transfer');
+            $table->string('snap_token')->nullable();
             $table->enum('status', ['pending','confirmed','failed','refunded'])->default('pending');
-            $table->string('transaction_id')->nullable(); // dari payment gateway
-            $table->string('proof_path')->nullable(); // bukti transfer upload
+            $table->string('transaction_id')->nullable(); 
+            // $table->string('proof_path')->nullable(); 
             $table->timestamp('paid_at')->nullable();
             $table->text('note')->nullable();
             $table->timestamps();

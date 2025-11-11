@@ -132,7 +132,7 @@
 
                     {{-- Tombol Aksi --}}
                     <div class="flex gap-3 border-t pt-6 justify-end">
-                        <a href="{{ route('admin.programs.index') }}" class="inline-flex items-center gap-2 px-5 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">
+                       <a href="{{ url()->previous() }}"  class="inline-flex items-center gap-2 px-5 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">
                             <i data-feather="x" class="w-4 h-4"></i>Batal
                         </a>
                         <button type="submit" class="inline-flex items-center gap-2 px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium">

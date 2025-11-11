@@ -15,7 +15,6 @@ public function index(Request $request)
 {
     $query = Event::query();
 
-    // Filter pencarian
     if ($request->has('search') && $request->search != '') {
         $query->where(function ($q) use ($request) {
             $q->where('title', 'like', '%' . $request->search . '%')
@@ -23,18 +22,15 @@ public function index(Request $request)
         });
     }
 
-    // Filter kategori
     if ($request->has('category') && $request->category != '') {
         $query->where('category_id', $request->category);
     }
 
-    // Ambil event utama
     $events = $query->withCount(['likes', 'comments'])
         ->latest()
         ->paginate(9)
         ->withQueryString();
 
-    // Status Like per user
     $userLikesOnPage = collect();
     if (Auth::check()) {
         $eventIds = $events->pluck('id');

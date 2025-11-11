@@ -6,7 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'WaliCare') }}</title>
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('storage/logo.png') }}">
+    <link rel="icon" href="{{ asset('storage/logo.jpg') }}" type="image/png">
+
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     

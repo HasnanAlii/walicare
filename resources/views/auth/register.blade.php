@@ -44,7 +44,7 @@
                     Daftar
                 </x-primary-button>
 
-                <!-- Divider -->
+                {{-- <!-- Divider -->
                 <div class="flex items-center my-4">
                     <hr class="flex-grow border-gray-300">
                     <span class="mx-2 text-gray-400 text-sm">ATAU</span>
@@ -60,7 +60,7 @@
                         <i class="fab fa-facebook-f mr-2"></i> Daftar dengan Facebook
                     </a>
                  
-                </div>
+                </div> --}}
 
                 {{-- Login Link --}}
                 <p class="mt-4 text-center text-sm text-gray-600">
