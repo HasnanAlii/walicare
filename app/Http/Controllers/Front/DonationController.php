@@ -73,7 +73,7 @@ class DonationController extends Controller
 
         $params = [
             'transaction_details' => [
-                'order_id'     => 'DONATIONS-' . $donation->id,
+                'order_id'     => 'DONASI-' . $donation->id,
                 'gross_amount' => $uniqueAmount,
             ],
             'customer_details' => [
@@ -115,7 +115,7 @@ public function midtransCallback(Request $request)
     $fraud = $notif->fraud_status ?? null;
     $type = $notif->payment_type ?? null;
 
-    $donationId = str_replace('DONATIONS-', '', $orderId);
+    $donationId = str_replace('DONASI-', '', $orderId);
     $donation = Donation::find($donationId);
 
     if (!$donation) {
