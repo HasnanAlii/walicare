@@ -151,7 +151,7 @@
                         @if($program->media->count())
                             <div class="flow-root">
                                 <ul role="list" class="-mb-8">
-                                    @foreach($program->media->sortByDesc('created_at') as $index => $item)
+                                    @foreach($program->media->sortBy('created_at') as $index => $item)
                                     <li>
                                         <div class="relative pb-8">
                                             @if(!$loop->last)
