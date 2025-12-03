@@ -88,22 +88,22 @@
                                     <div>
                                         <p class="font-semibold text-green-700">{{ $program->title }}</p>
                                        <p class="text-sm text-gray-500 flex items-center gap-1 leading-none">
-    <span>Target:</span>
+                                        <span>Target:</span>
 
-    @if ($program->target_amount == 0)
-        {{-- Ikon tanpa batas (infinity) --}}
-        <svg xmlns="http://www.w3.org/2000/svg" 
-            fill="none" viewBox="0 0 24 24" 
-            stroke-width="2" stroke="currentColor" 
-            class="w-4 h-4 text-green-600">
-            <path stroke-linecap="round" stroke-linejoin="round" 
-                d="M18.364 5.636a9 9 0 010 12.728M5.636 5.636a9 9 0 000 12.728m0 0L18.364 5.636m0 12.728L5.636 5.636" />
-        </svg>
-        <span class="text-green-600">Tanpa Batas</span>
-    @else
-        <span>Rp {{ number_format($program->target_amount, 0, ',', '.') }}</span>
-    @endif
-</p>
+                                        @if ($program->target_amount == 0)
+                                            {{-- Ikon tanpa batas (infinity) --}}
+                                            <svg xmlns="http://www.w3.org/2000/svg" 
+                                                fill="none" viewBox="0 0 24 24" 
+                                                stroke-width="2" stroke="currentColor" 
+                                                class="w-4 h-4 text-green-600">
+                                                <path stroke-linecap="round" stroke-linejoin="round" 
+                                                    d="M18.364 5.636a9 9 0 010 12.728M5.636 5.636a9 9 0 000 12.728m0 0L18.364 5.636m0 12.728L5.636 5.636" />
+                                            </svg>
+                                            <span class="text-green-600">Tanpa Batas</span>
+                                        @else
+                                            <span>Rp {{ number_format($program->target_amount, 0, ',', '.') }}</span>
+                                        @endif
+                                    </p>
 
                                     </div>
                                 </div>

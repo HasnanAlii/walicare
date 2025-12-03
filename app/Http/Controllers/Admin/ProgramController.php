@@ -211,13 +211,10 @@ class ProgramController extends Controller
      */
     public function show(Program $program)
     {
-        // Load semua relasi yang dibutuhkan
         $program->load(['category', 'media', 'uses']);
 
-        // Decode breakdown JSON
         $breakdown = $program->breakdown ? json_decode($program->breakdown, true) : [];
 
-        // Ambil media dan donasi terbaru
         $media = $program->media;
         $recentDonations = $program->donations()
             ->where('status', 'confirmed')

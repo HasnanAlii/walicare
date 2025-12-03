@@ -392,8 +392,9 @@
                     </div>
                     <div class="mb-4">
                         <label class="block text-sm font-medium mb-1">Jumlah (Rp) *</label>
-                        <input type="number" name="amount" x-model="useAmount" required min="0"
-                            class="w-full border-gray-300 p-2 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500"
+                        <input type="text" name="amount" x-model="useAmount" required min="0"
+                            
+                        class="w-full number-format border-gray-300 p-2 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500"
                             placeholder="Masukan Jumlah">
                     </div>
                     <div class="mb-4">

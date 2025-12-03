@@ -27,7 +27,7 @@
                 <h4 class="text-sm font-semibold text-white tracking-wider uppercase">Navigasi</h4>
                 <ul class="mt-4 space-y-3">
                     <li>
-                        <a href="{{ route('home') }}" class="text-base text-gray-200 hover:text-white transition">Home</a>
+                        <a href="{{ route('home') }}" class="text-base text-gray-200 hover:text-white transition">Beranda</a>
                     </li>
                     <li>
                         <a href="{{ route('programs.index') }}" class="text-base text-gray-200 hover:text-white transition">Program Donasi</a>

@@ -12,15 +12,20 @@ use App\Exports\ProgramUsesExport;
 
 class ProgramUseExportController extends Controller
 {
-    public function exportPdf()
-    {
-        $programUses = ProgramUse::with('program')->orderBy('tanggal', 'desc')->get();
+public function exportPdf()
+{
+    $programUses = ProgramUse::with('program')
+        ->whereMonth('tanggal', now()->month)
+        ->whereYear('tanggal', now()->year)
+        ->orderBy('tanggal', 'desc')
+        ->get();
 
-        $pdf = Pdf::loadView('admin.programs.pdf', compact('programUses'))
-            ->setPaper('a4', 'landscape');
+    $pdf = Pdf::loadView('admin.programs.pdf', compact('programUses'))
+        ->setPaper('a4', 'landscape');
 
-        return $pdf->stream('Laporan_Pengeluaran_Dana.pdf');
-    }
+    return $pdf->stream('Laporan_Pengeluaran_Dana_' . now()->format('F_Y') . '.pdf');
+}
+
 
     public function exportExcel()
     {

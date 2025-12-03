@@ -177,7 +177,31 @@
             Swal.fire({ icon: 'error', title: "Ooops!", html: errors });
         @endif
     </script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
 
+            function formatRibuan(input) {
+                input.addEventListener("input", function () {
+                    let raw = this.value.replace(/\D/g, "");
+                    this.value = raw.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                });
+            }
+
+            // Terapkan ke semua input yang punya class number-format
+            document.querySelectorAll(".number-format").forEach(formatRibuan);
+
+            // Bersihkan titik sebelum submit agar angka murni masuk DB
+            document.querySelectorAll("form").forEach(form => {
+                form.addEventListener("submit", function () {
+                    this.querySelectorAll(".number-format").forEach(input => {
+                        input.value = input.value.replace(/\./g, "");
+                    });
+                });
+            });
+
+        });
+    </script>
     @stack('scripts')
 </body>
 </html>
