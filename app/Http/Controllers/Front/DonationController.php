@@ -73,7 +73,7 @@ class DonationController extends Controller
 
         $params = [
             'transaction_details' => [
-                'order_id'     => 'DONASI-' . $donation->id,
+                'order_id'     => 'DONASIII-' . $donation->id,
                 'gross_amount' => $uniqueAmount,
             ],
             'customer_details' => [
@@ -115,7 +115,7 @@ public function midtransCallback(Request $request)
     $fraud = $notif->fraud_status ?? null;
     $type = $notif->payment_type ?? null;
 
-    $donationId = str_replace('DONASI-', '', $orderId);
+    $donationId = str_replace('DONASIII-', '', $orderId);
     $donation = Donation::find($donationId);
 
     if (!$donation) {
@@ -181,44 +181,39 @@ public function midtransCallback(Request $request)
         {
             return view('front.donations.failed');
         }
-
- 
+            
     public function testConnection()
     {
-        MidtransConfig::init();
-
         $serverKey = env('MIDTRANS_SERVER_KEY');
-        $url = env('MIDTRANS_IS_PRODUCTION')
-            ? 'https://api.midtrans.com/v2/status/test-connection'
-            : 'https://api.sandbox.midtrans.com/v2/status/test-connection';
+        $isProd = env('MIDTRANS_IS_PRODUCTION') == true;
+
+        $baseUrl = $isProd
+            ? 'https://api.midtrans.com'
+            : 'https://api.sandbox.midtrans.com';
 
         try {
-            $response = Http::withBasicAuth($serverKey, '')->get($url);
-            $body = $response->json();
-
-            if ($response->ok() && isset($body['status_message'])) {
-                return response()->json([
-                    'success' => true,
-                    'message' => '✅ Koneksi ke Midtrans berhasil!',
-                    'environment' => env('MIDTRANS_IS_PRODUCTION') ? 'Production' : 'Sandbox',
-                    'response' => $body,
-                ]);
-            }
+            // Cara benar: hit endpoint status dengan order dummy
+            $response = Http::withBasicAuth($serverKey, '')
+                ->get($baseUrl . '/v2/DUMMY-ORDER-123/status');
 
             return response()->json([
-                'success' => false,
-                'message' => '❌ Gagal koneksi ke Midtrans.',
-                'response' => $body,
-            ], $response->status());
+                'success' => true,
+                'message' => '✅ Server Midtrans TERJANGKAU',
+                'http_status' => $response->status(),
+                'environment' => $isProd ? 'Production' : 'Sandbox',
+                'note' => '404 atau 401 = normal untuk order dummy',
+                'response' => $response->json(),
+            ]);
+
         } catch (\Exception $e) {
-            // Log::error('❌ Midtrans Connection Error', ['error' => $e->getMessage()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan koneksi.',
-                'error'   => $e->getMessage(),
+                'message' => '❌ Tidak bisa reach server Midtrans',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
+
 }
 
     // /**

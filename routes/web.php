@@ -57,6 +57,7 @@ Route::prefix('donor')->group(function () {
     Route::get('/payment/failed', [DonationController::class, 'failed'])->name('payment.failed');
     Route::post('/midtrans/callback', [DonationController::class, 'midtransCallback'])->name('midtrans.callback');
     Route::get('/midtrans/test', [DonationController::class, 'testConnection'])->name('midtrans.test');
+    
     Route::get('/api/donations/status/{donation}', function (App\Models\Donation $donation) {
         return response()->json(['status' => $donation->status]);
     });
